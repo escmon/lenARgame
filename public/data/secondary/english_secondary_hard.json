@@ -1,0 +1,302 @@
+[
+  {
+    "q": "What does the idiom 'Piece of cake' mean?",
+    "a": "Very easy",
+    "c": [
+      "I don't know",
+      "Very easy",
+      "Very hard"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Break a leg' mean?",
+    "a": "Good luck",
+    "c": [
+      "Get hurt",
+      "Good luck",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Bite the bullet' mean?",
+    "a": "Face a hard situation",
+    "c": [
+      "I don't know",
+      "Eat a bullet",
+      "Face a hard situation"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Hit the sack' mean?",
+    "a": "Go to sleep",
+    "c": [
+      "I don't know",
+      "Hit someone",
+      "Go to sleep"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Under the weather' mean?",
+    "a": "Feeling sick",
+    "c": [
+      "I don't know",
+      "Feeling sick",
+      "Raining"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Call it a day' mean?",
+    "a": "Stop working",
+    "c": [
+      "Make a call",
+      "Stop working",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Hang in there' mean?",
+    "a": "Don't give up",
+    "c": [
+      "Don't give up",
+      "I don't know",
+      "Hang a picture"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Miss the boat' mean?",
+    "a": "It's too late",
+    "c": [
+      "It's too late",
+      "Miss a ship",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'On cloud nine' mean?",
+    "a": "Very happy",
+    "c": [
+      "I don't know",
+      "Very happy",
+      "Very sad"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Spill the beans' mean?",
+    "a": "Reveal a secret",
+    "c": [
+      "Reveal a secret",
+      "Drop beans",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Cut corners' mean?",
+    "a": "Do something poorly",
+    "c": [
+      "Cut paper",
+      "Do something poorly",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Get out of hand' mean?",
+    "a": "Get out of control",
+    "c": [
+      "I don't know",
+      "Get out of control",
+      "Drop something"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Pull someone's leg' mean?",
+    "a": "Joke with someone",
+    "c": [
+      "I don't know",
+      "Joke with someone",
+      "Pull a leg"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Time flies' mean?",
+    "a": "Time passes quickly",
+    "c": [
+      "I don't know",
+      "Time passes quickly",
+      "Flying clocks"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'A dime a dozen' mean?",
+    "a": "Very common",
+    "c": [
+      "I don't know",
+      "Very common",
+      "Very expensive"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Beat around the bush' mean?",
+    "a": "Avoid the main topic",
+    "c": [
+      "Avoid the main topic",
+      "I don't know",
+      "Cut trees"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Better late than never' mean?",
+    "a": "Better to do it late",
+    "c": [
+      "I don't know",
+      "Better to do it late",
+      "Don't do it at all"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Bite off more than you can chew' mean?",
+    "a": "Take a big task",
+    "c": [
+      "Take a big task",
+      "I don't know",
+      "Eat too much"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'By the skin of your teeth' mean?",
+    "a": "Just barely",
+    "c": [
+      "I don't know",
+      "Just barely",
+      "Brush teeth"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Don't cry over spilled milk' mean?",
+    "a": "Don't worry about the past",
+    "c": [
+      "I don't know",
+      "Don't worry about the past",
+      "Wipe the floor"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Every cloud has a silver lining' mean?",
+    "a": "Good things come after bad",
+    "c": [
+      "Good things come after bad",
+      "Look at clouds",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Go the extra mile' mean?",
+    "a": "Do extra effort",
+    "c": [
+      "Do extra effort",
+      "I don't know",
+      "Run a mile"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Hit the nail on the head' mean?",
+    "a": "Say exactly right",
+    "c": [
+      "Say exactly right",
+      "I don't know",
+      "Use a hammer"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Let the cat out of the bag' mean?",
+    "a": "Reveal a secret",
+    "c": [
+      "Reveal a secret",
+      "Save a cat",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Once in a blue moon' mean?",
+    "a": "Very rarely",
+    "c": [
+      "I don't know",
+      "Very rarely",
+      "Look at the moon"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Put all your eggs in one basket' mean?",
+    "a": "Risk everything",
+    "c": [
+      "Risk everything",
+      "Cook eggs",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'See eye to eye' mean?",
+    "a": "Agree completely",
+    "c": [
+      "I don't know",
+      "Agree completely",
+      "Stare at someone"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Steal someone's thunder' mean?",
+    "a": "Take credit",
+    "c": [
+      "Steal a storm",
+      "Take credit",
+      "I don't know"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Take it with a pinch of salt' mean?",
+    "a": "Don't believe it completely",
+    "c": [
+      "I don't know",
+      "Eat salt",
+      "Don't believe it completely"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What does the idiom 'Throw caution to the wind' mean?",
+    "a": "Take a risk",
+    "c": [
+      "Take a risk",
+      "Throw things",
+      "I don't know"
+    ],
+    "img": ""
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "q": "Yesterday, I ___ to school.",
+    "a": "went",
+    "c": [
+      "go",
+      "went",
+      "going"
+    ],
+    "img": ""
+  },
+  {
+    "q": "She ___ playing tennis now.",
+    "a": "is",
+    "c": [
+      "are",
+      "am",
+      "is"
+    ],
+    "img": ""
+  },
+  {
+    "q": "An elephant is ___ than a mouse.",
+    "a": "bigger",
+    "c": [
+      "big",
+      "biggest",
+      "bigger"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What is the plural form of 'Child'?",
+    "a": "Children",
+    "c": [
+      "Children",
+      "Childs",
+      "Childes"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I usually go to bed ___ 10 PM.",
+    "a": "at",
+    "c": [
+      "in",
+      "on",
+      "at"
+    ],
+    "img": ""
+  },
+  {
+    "q": "My father's brother is my ___.",
+    "a": "Uncle",
+    "c": [
+      "Aunt",
+      "Cousin",
+      "Uncle"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Synonym for 'Happy' is ___.",
+    "a": "Glad",
+    "c": [
+      "Angry",
+      "Sad",
+      "Glad"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Antonym for 'Always' is ___.",
+    "a": "Never",
+    "c": [
+      "Often",
+      "Never",
+      "Sometimes"
+    ],
+    "img": ""
+  },
+  {
+    "q": "The book is ___ the table.",
+    "a": "on",
+    "c": [
+      "in",
+      "under",
+      "on"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Which month comes before December?",
+    "a": "November",
+    "c": [
+      "January",
+      "October",
+      "November"
+    ],
+    "img": ""
+  },
+  {
+    "q": "A person who teaches is a ___.",
+    "a": "Teacher",
+    "c": [
+      "Teacher",
+      "Farmer",
+      "Doctor"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I have been waiting ___ two hours.",
+    "a": "for",
+    "c": [
+      "for",
+      "in",
+      "since"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Would you like ___ water?",
+    "a": "some",
+    "c": [
+      "any",
+      "many",
+      "some"
+    ],
+    "img": ""
+  },
+  {
+    "q": "He ___ got a new bicycle.",
+    "a": "has",
+    "c": [
+      "having",
+      "has",
+      "have"
+    ],
+    "img": ""
+  },
+  {
+    "q": "This is ___ umbrella.",
+    "a": "an",
+    "c": [
+      "a",
+      "the",
+      "an"
+    ],
+    "img": ""
+  },
+  {
+    "q": "He is the ___ boy in the class.",
+    "a": "tallest",
+    "c": [
+      "taller",
+      "tall",
+      "tallest"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Can you ___ me a favor?",
+    "a": "do",
+    "c": [
+      "make",
+      "have",
+      "do"
+    ],
+    "img": ""
+  },
+  {
+    "q": "A doctor works in a ___.",
+    "a": "Hospital",
+    "c": [
+      "School",
+      "Hospital",
+      "Bank"
+    ],
+    "img": ""
+  },
+  {
+    "q": "They ___ not like pizza.",
+    "a": "do",
+    "c": [
+      "does",
+      "do",
+      "are"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I ___ my homework every day.",
+    "a": "do",
+    "c": [
+      "play",
+      "make",
+      "do"
+    ],
+    "img": ""
+  }
+]

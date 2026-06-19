@@ -1,0 +1,202 @@
+[
+  {
+    "q": "What color is an apple?",
+    "a": "Red",
+    "c": [
+      "Black",
+      "Blue",
+      "Red"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Which animal says 'Meow'?",
+    "a": "Cat",
+    "c": [
+      "Bird",
+      "Cat",
+      "Dog"
+    ],
+    "img": ""
+  },
+  {
+    "q": "How many days are in a week?",
+    "a": "7 days",
+    "c": [
+      "10 days",
+      "7 days",
+      "5 days"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What is the opposite of 'Big'?",
+    "a": "Small",
+    "c": [
+      "Small",
+      "Long",
+      "Tall"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I ___ a boy.",
+    "a": "am",
+    "c": [
+      "am",
+      "is",
+      "are"
+    ],
+    "img": ""
+  },
+  {
+    "q": "She ___ a student.",
+    "a": "is",
+    "c": [
+      "are",
+      "am",
+      "is"
+    ],
+    "img": ""
+  },
+  {
+    "q": "You ___ my friend.",
+    "a": "are",
+    "c": [
+      "am",
+      "is",
+      "are"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What number comes after 10?",
+    "a": "Eleven",
+    "c": [
+      "Nine",
+      "Twelve",
+      "Eleven"
+    ],
+    "img": ""
+  },
+  {
+    "q": "A monkey likes to eat ___.",
+    "a": "Bananas",
+    "c": [
+      "Meat",
+      "Bones",
+      "Bananas"
+    ],
+    "img": ""
+  },
+  {
+    "q": "We use our ___ to see.",
+    "a": "Eyes",
+    "c": [
+      "Ears",
+      "Eyes",
+      "Nose"
+    ],
+    "img": ""
+  },
+  {
+    "q": "The sun is ___.",
+    "a": "Hot",
+    "c": [
+      "Hot",
+      "Freezing",
+      "Cold"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Today is Monday, tomorrow is ___.",
+    "a": "Tuesday",
+    "c": [
+      "Tuesday",
+      "Sunday",
+      "Wednesday"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I sleep in the ___.",
+    "a": "Bedroom",
+    "c": [
+      "Bathroom",
+      "Bedroom",
+      "Kitchen"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Which fruit is yellow and sour?",
+    "a": "Lemon",
+    "c": [
+      "Apple",
+      "Lemon",
+      "Grape"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Fish live in the ___.",
+    "a": "Water",
+    "c": [
+      "Sky",
+      "Tree",
+      "Water"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What is the opposite of 'Good'?",
+    "a": "Bad",
+    "c": [
+      "Sad",
+      "Happy",
+      "Bad"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Birds can ___.",
+    "a": "Fly",
+    "c": [
+      "Fly",
+      "Swim",
+      "Run"
+    ],
+    "img": ""
+  },
+  {
+    "q": "A baby dog is called a ___.",
+    "a": "Puppy",
+    "c": [
+      "Kitten",
+      "Cub",
+      "Puppy"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Please ___ the door.",
+    "a": "Open",
+    "c": [
+      "Sit",
+      "Open",
+      "Stand"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I drink ___ every morning.",
+    "a": "Milk",
+    "c": [
+      "Rice",
+      "Milk",
+      "Bread"
+    ],
+    "img": ""
+  }
+]

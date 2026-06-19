@@ -1,0 +1,202 @@
+[
+  {
+    "q": "แมว ภาษาอังกฤษคือ?",
+    "a": "Cat",
+    "c": [
+      "Bat",
+      "Cat",
+      "Dog"
+    ],
+    "img": "/images/english/cat.png"
+  },
+  {
+    "q": "สุนัข ภาษาอังกฤษคือ?",
+    "a": "Dog",
+    "c": [
+      "Bird",
+      "Dog",
+      "Cat"
+    ],
+    "img": "/images/english/dog.png"
+  },
+  {
+    "q": "กระต่าย ภาษาอังกฤษคือ?",
+    "a": "Rabbit",
+    "c": [
+      "Duck",
+      "Cow",
+      "Rabbit"
+    ],
+    "img": "/images/english/rabbit.png"
+  },
+  {
+    "q": "นก ภาษาอังกฤษคือ?",
+    "a": "Bird",
+    "c": [
+      "Fish",
+      "Bird",
+      "Ant"
+    ],
+    "img": "/images/english/bird.png"
+  },
+  {
+    "q": "ปลา ภาษาอังกฤษคือ?",
+    "a": "Fish",
+    "c": [
+      "Dog",
+      "Fish",
+      "Bird"
+    ],
+    "img": "/images/english/fish.png"
+  },
+  {
+    "q": "เลข 1 ภาษาอังกฤษคือ?",
+    "a": "One",
+    "c": [
+      "One",
+      "Two",
+      "Three"
+    ],
+    "img": "/images/english/num1.png"
+  },
+  {
+    "q": "เลข 2 ภาษาอังกฤษคือ?",
+    "a": "Two",
+    "c": [
+      "One",
+      "Three",
+      "Two"
+    ],
+    "img": "/images/english/num2.png"
+  },
+  {
+    "q": "เลข 3 ภาษาอังกฤษคือ?",
+    "a": "Three",
+    "c": [
+      "Three",
+      "Four",
+      "Two"
+    ],
+    "img": "/images/english/num3.png"
+  },
+  {
+    "q": "เลข 4 ภาษาอังกฤษคือ?",
+    "a": "Four",
+    "c": [
+      "Three",
+      "Five",
+      "Four"
+    ],
+    "img": "/images/english/num4.png"
+  },
+  {
+    "q": "เลข 5 ภาษาอังกฤษคือ?",
+    "a": "Five",
+    "c": [
+      "Six",
+      "Four",
+      "Five"
+    ],
+    "img": "/images/english/num5.png"
+  },
+  {
+    "q": "Boy แปลว่าอะไร?",
+    "a": "เด็กผู้ชาย",
+    "c": [
+      "เด็กผู้ชาย",
+      "คุณครู",
+      "เด็กผู้หญิง"
+    ],
+    "img": "/images/english/boy.png"
+  },
+  {
+    "q": "Girl แปลว่าอะไร?",
+    "a": "เด็กผู้หญิง",
+    "c": [
+      "เด็กผู้ชาย",
+      "ตำรวจ",
+      "เด็กผู้หญิง"
+    ],
+    "img": "/images/english/girl.png"
+  },
+  {
+    "q": "Sun แปลว่าอะไร?",
+    "a": "ดวงอาทิตย์",
+    "c": [
+      "ดวงอาทิตย์",
+      "ดวงดาว",
+      "ดวงจันทร์"
+    ],
+    "img": "/images/english/sun.png"
+  },
+  {
+    "q": "Moon แปลว่าอะไร?",
+    "a": "ดวงจันทร์",
+    "c": [
+      "ก้อนเมฆ",
+      "ดวงอาทิตย์",
+      "ดวงจันทร์"
+    ],
+    "img": "/images/english/moon.png"
+  },
+  {
+    "q": "Star แปลว่าอะไร?",
+    "a": "ดวงดาว",
+    "c": [
+      "ภูเขา",
+      "ดวงดาว",
+      "ต้นไม้"
+    ],
+    "img": "/images/english/star.png"
+  },
+  {
+    "q": "Tree แปลว่าอะไร?",
+    "a": "ต้นไม้",
+    "c": [
+      "ต้นไม้",
+      "ดอกไม้",
+      "หญ้า"
+    ],
+    "img": "/images/english/tree.png"
+  },
+  {
+    "q": "Flower แปลว่าอะไร?",
+    "a": "ดอกไม้",
+    "c": [
+      "ต้นไม้",
+      "ดอกไม้",
+      "ผลไม้"
+    ],
+    "img": "/images/english/flower.png"
+  },
+  {
+    "q": "Car แปลว่าอะไร?",
+    "a": "รถยนต์",
+    "c": [
+      "รถไฟ",
+      "เรือ",
+      "รถยนต์"
+    ],
+    "img": "/images/english/car.png"
+  },
+  {
+    "q": "Book แปลว่าอะไร?",
+    "a": "หนังสือ",
+    "c": [
+      "ดินสอ",
+      "ยางลบ",
+      "หนังสือ"
+    ],
+    "img": "/images/english/book.png"
+  },
+  {
+    "q": "Pencil แปลว่าอะไร?",
+    "a": "ดินสอ",
+    "c": [
+      "ไม้บรรทัด",
+      "ปากกา",
+      "ดินสอ"
+    ],
+    "img": "/images/english/pencil.png"
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "q": "What letter comes after A?",
+    "a": "B",
+    "c": [
+      "C",
+      "B",
+      "D"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What letter comes after B?",
+    "a": "C",
+    "c": [
+      "E",
+      "D",
+      "C"
+    ],
+    "img": ""
+  },
+  {
+    "q": "What letter comes after C?",
+    "a": "D",
+    "c": [
+      "E",
+      "F",
+      "D"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Which letter is 'A'?",
+    "a": "A",
+    "c": [
+      "B",
+      "A",
+      "C"
+    ],
+    "img": "/images/english/letter_a.png"
+  },
+  {
+    "q": "Which letter is 'B'?",
+    "a": "B",
+    "c": [
+      "D",
+      "C",
+      "B"
+    ],
+    "img": "/images/english/letter_b.png"
+  },
+  {
+    "q": "Which letter is 'C'?",
+    "a": "C",
+    "c": [
+      "C",
+      "D",
+      "E"
+    ],
+    "img": "/images/english/letter_c.png"
+  },
+  {
+    "q": "สีแดง ภาษาอังกฤษคือ?",
+    "a": "Red",
+    "c": [
+      "Blue",
+      "Red",
+      "Green"
+    ],
+    "img": "/images/english/color_red.png"
+  },
+  {
+    "q": "สีน้ำเงิน ภาษาอังกฤษคือ?",
+    "a": "Blue",
+    "c": [
+      "Blue",
+      "Yellow",
+      "Red"
+    ],
+    "img": "/images/english/color_blue.png"
+  },
+  {
+    "q": "สีเหลือง ภาษาอังกฤษคือ?",
+    "a": "Yellow",
+    "c": [
+      "Pink",
+      "Green",
+      "Yellow"
+    ],
+    "img": "/images/english/color_yellow.png"
+  },
+  {
+    "q": "สีเขียว ภาษาอังกฤษคือ?",
+    "a": "Green",
+    "c": [
+      "Green",
+      "Blue",
+      "Red"
+    ],
+    "img": "/images/english/color_green.png"
+  },
+  {
+    "q": "สีชมพู ภาษาอังกฤษคือ?",
+    "a": "Pink",
+    "c": [
+      "White",
+      "Black",
+      "Pink"
+    ],
+    "img": "/images/english/color_pink.png"
+  },
+  {
+    "q": "สีดำ ภาษาอังกฤษคือ?",
+    "a": "Black",
+    "c": [
+      "Pink",
+      "White",
+      "Black"
+    ],
+    "img": "/images/english/color_black.png"
+  },
+  {
+    "q": "สีขาว ภาษาอังกฤษคือ?",
+    "a": "White",
+    "c": [
+      "Red",
+      "Black",
+      "White"
+    ],
+    "img": "/images/english/color_white.png"
+  },
+  {
+    "q": "Apple คือผลไม้อะไร?",
+    "a": "แอปเปิล",
+    "c": [
+      "กล้วย",
+      "แอปเปิล",
+      "ส้ม"
+    ],
+    "img": "/images/english/apple.png"
+  },
+  {
+    "q": "Banana คือผลไม้อะไร?",
+    "a": "กล้วย",
+    "c": [
+      "ส้ม",
+      "กล้วย",
+      "แอปเปิล"
+    ],
+    "img": "/images/english/banana.png"
+  },
+  {
+    "q": "Orange คือผลไม้อะไร?",
+    "a": "ส้ม",
+    "c": [
+      "กล้วย",
+      "แตงโม",
+      "ส้ม"
+    ],
+    "img": "/images/english/orange.png"
+  },
+  {
+    "q": "A is for ___ ?",
+    "a": "Apple",
+    "c": [
+      "Dog",
+      "Apple",
+      "Cat"
+    ],
+    "img": ""
+  },
+  {
+    "q": "B is for ___ ?",
+    "a": "Boy / Bat",
+    "c": [
+      "Boy / Bat",
+      "Sun",
+      "Cat"
+    ],
+    "img": ""
+  },
+  {
+    "q": "C is for ___ ?",
+    "a": "Cat",
+    "c": [
+      "Cat",
+      "Ant",
+      "Dog"
+    ],
+    "img": ""
+  },
+  {
+    "q": "D is for ___ ?",
+    "a": "Dog",
+    "c": [
+      "Dog",
+      "Fish",
+      "Egg"
+    ],
+    "img": ""
+  }
+]

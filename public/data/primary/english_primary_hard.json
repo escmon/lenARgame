@@ -1,0 +1,202 @@
+[
+  {
+    "q": "If I ___ you, I would study harder.",
+    "a": "were",
+    "c": [
+      "was",
+      "were",
+      "am"
+    ],
+    "img": ""
+  },
+  {
+    "q": "The letter ___ sent yesterday.",
+    "a": "was",
+    "c": [
+      "was",
+      "has",
+      "is"
+    ],
+    "img": ""
+  },
+  {
+    "q": "She hasn't finished her homework ___.",
+    "a": "yet",
+    "c": [
+      "still",
+      "already",
+      "yet"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Synonym of 'Enormous' is ___.",
+    "a": "Huge",
+    "c": [
+      "Tiny",
+      "Huge",
+      "Small"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Antonym of 'Abundant' is ___.",
+    "a": "Scarce",
+    "c": [
+      "Scarce",
+      "Many",
+      "Plentiful"
+    ],
+    "img": ""
+  },
+  {
+    "q": "He is used to ___ up early.",
+    "a": "waking",
+    "c": [
+      "wake",
+      "waking",
+      "woke"
+    ],
+    "img": ""
+  },
+  {
+    "q": "By next year, I ___ from primary school.",
+    "a": "will have graduated",
+    "c": [
+      "graduate",
+      "will have graduated",
+      "will graduate"
+    ],
+    "img": ""
+  },
+  {
+    "q": "It's raining cats and ___.",
+    "a": "dogs",
+    "c": [
+      "dogs",
+      "birds",
+      "mice"
+    ],
+    "img": ""
+  },
+  {
+    "q": "The Eiffel Tower is ___ in Paris.",
+    "a": "located",
+    "c": [
+      "locating",
+      "locate",
+      "located"
+    ],
+    "img": ""
+  },
+  {
+    "q": "You had better ___ a doctor.",
+    "a": "see",
+    "c": [
+      "to see",
+      "see",
+      "seeing"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Despite ___ tired, she kept working.",
+    "a": "being",
+    "c": [
+      "was",
+      "be",
+      "being"
+    ],
+    "img": ""
+  },
+  {
+    "q": "A person who designs buildings is an ___.",
+    "a": "Architect",
+    "c": [
+      "Architect",
+      "Engineer",
+      "Artist"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I look forward to ___ you.",
+    "a": "seeing",
+    "c": [
+      "seeing",
+      "saw",
+      "see"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Hardly had I left the house ___ it started to rain.",
+    "a": "when",
+    "c": [
+      "than",
+      "when",
+      "then"
+    ],
+    "img": ""
+  },
+  {
+    "q": "Which word is an Adverb?",
+    "a": "Quickly",
+    "c": [
+      "Quick",
+      "Quickly",
+      "Quickness"
+    ],
+    "img": ""
+  },
+  {
+    "q": "He apologized ___ being late.",
+    "a": "for",
+    "c": [
+      "to",
+      "about",
+      "for"
+    ],
+    "img": ""
+  },
+  {
+    "q": "To 'break the ice' means to ___.",
+    "a": "start a conversation",
+    "c": [
+      "end a meeting",
+      "start a conversation",
+      "destroy ice"
+    ],
+    "img": ""
+  },
+  {
+    "q": "She speaks English ___.",
+    "a": "fluently",
+    "c": [
+      "fluent",
+      "fluently",
+      "fluency"
+    ],
+    "img": ""
+  },
+  {
+    "q": "The meeting was put ___ due to the rain.",
+    "a": "off",
+    "c": [
+      "up",
+      "out",
+      "off"
+    ],
+    "img": ""
+  },
+  {
+    "q": "I wish I ___ more time.",
+    "a": "had",
+    "c": [
+      "had",
+      "has",
+      "have"
+    ],
+    "img": ""
+  }
+]
