@@ -229,23 +229,28 @@ const onResults = (results) => {
   if (isLoading.value) isLoading.value = false
   if (gameEnded.value) return
 
-  const ctx = canvasElement.value ? canvasElement.value.getContext('2d') : null
-  if (!ctx || !canvasElement.value) return
+  const canvas = canvasElement.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
 
-  ctx.save(); ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
-  ctx.translate(canvasElement.value.width, 0); ctx.scale(-1, 1)
-  ctx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
+  // 1. วาดภาพกล้องและสั่งคืนค่าทันทีในทุกเฟรม ป้องกันอาการจอกระพริบตาลาย
+  ctx.save()
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.translate(canvas.width, 0)
+  ctx.scale(-1, 1)
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height)
+  ctx.restore() // <-- จุดสำคัญ: ปิดลูปตรงนี้ทันทีเพื่อให้สถานะหน้าจอเสถียร 100%
 
   const hasHands = results.multiHandLandmarks && results.multiHandLandmarks.length > 0
   if (hasHands && !isPlaying.value && timeLeft.value === 100) startGameTimer()
 
   if (hasHands && isPlaying.value) {
     const landmarks = results.multiHandLandmarks[0]
-    
-    // วงกลมชี้เป้าแบบใหม่ ป้องกันค้าง
     const indexTip = landmarks[8]
     const thumb = landmarks[4]
     
+    // คำนวณพิกัดให้ตรงกับตำแหน่งหน้าจอ HTML พอดีเป๊ะ
     const cursorX = window.innerWidth - (indexTip.x * window.innerWidth)
     const cursorY = indexTip.y * window.innerHeight
     const distance = Math.hypot((thumb.x - indexTip.x) * window.innerWidth, (thumb.y - indexTip.y) * window.innerHeight)
@@ -253,16 +258,23 @@ const onResults = (results) => {
     const grabThreshold = window.innerWidth < 768 ? 30 : 40
     isHandGrabbing = distance < grabThreshold
 
-    ctx.restore(); ctx.save(); ctx.beginPath(); 
-    ctx.arc(window.innerWidth - cursorX, cursorY, 15, 0, 2 * Math.PI)
+    // วาดเป้าเล็งสีเหลือง/เขียวตามมือนิ่งๆ ไม่กระตุก
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(cursorX, cursorY, 15, 0, 2 * Math.PI)
     ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'
-    ctx.shadowBlur = 10; ctx.shadowColor = '#000'; ctx.fill(); ctx.restore()
+    ctx.shadowBlur = 10; 
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+    ctx.fill()
+    ctx.restore()
 
+    // ลorจิกการหยิบและลากคำตอบ
     if (isHandGrabbing && !isTransitioning.value && !isPaused.value) {
       if (grabbedIndex === null) {
         for (let i = 0; i < 3; i++) {
           if (checkCollision(cursorX, cursorY, `choice-${i}`)) {
-            grabbedIndex = i; playGrab()
+            grabbedIndex = i
+            playGrab()
             choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-110 z-50'
             break
           }
@@ -270,40 +282,44 @@ const onResults = (results) => {
       } else {
         const el = document.getElementById(`choice-${grabbedIndex}`)
         const offset = window.innerWidth < 768 ? 40 : 80
-        if (el) { el.style.left = `${cursorX - offset}px`; el.style.top = `${cursorY - offset}px` }
+        if (el) { 
+          el.style.left = `${cursorX - offset}px`
+          el.style.top = `${cursorY - offset}px` 
+        }
         
-        // 🔥 แก้ไข Bug ขวาล่าง: เช็คโซนแบบ Loop เพื่อความเสถียร
-        const zones = ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br'];
-        let matchedZone = null;
+        const zones = ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br']
+        let matchedZone = null
 
         for (const zId of zones) {
           if (checkCollision(cursorX, cursorY, zId)) {
-            matchedZone = zId;
-            break; // เจอโซนแรกที่ชนให้หยุดเช็คทันที
+            matchedZone = zId
+            break
           }
         }
 
         if (matchedZone && !isTransitioning.value) {
-          const activeEl = document.getElementById(matchedZone);
+          const activeEl = document.getElementById(matchedZone)
           if (activeEl) {
-            isTransitioning.value = true;
-            activeEl.classList.add('corner-active');
+            isTransitioning.value = true
+            activeEl.classList.add('corner-active')
             
             if (currentChoices.value[grabbedIndex].value === currentQuestion.value.a) { 
-              score.value += 10; showToast("ถูกต้อง! 🌟", 'correct'); playCorrect() 
+              score.value += 10
+              showToast("ถูกต้อง! 🌟", 'correct')
+              playCorrect() 
             } else { 
-              showToast("ไม่ถูกต้อง ❌", 'wrong'); playWrong() 
+              showToast("ไม่ถูกต้อง ❌", 'wrong')
+              playWrong() 
             }
             if (el) el.style.display = 'none'
 
             setTimeout(() => { 
-              isTransitioning.value = false;
-              // ล้างสถานะทุกโซนป้องกันค้าง
+              isTransitioning.value = false
               zones.forEach(id => {
-                const z = document.getElementById(id);
-                if (z) z.classList.remove('corner-active');
-              });
-              nextQuestion(); 
+                const z = document.getElementById(id)
+                if (z) z.classList.remove('corner-active')
+              })
+              nextQuestion() 
             }, 2000)
           }
         }
