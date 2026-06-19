@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="th">
+ <head><script src="/_sdk/telemetry_sdk.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Racing Game</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+        * { font-family: 'Sarabun', sans-serif; }
+        body { margin: 0; overflow: hidden; }
+        .car-option { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 3px solid transparent; border-radius: 12px; padding: 8px; }
+        .car-option:hover { transform: scale(1.1); }
+        .car-option.selected { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251,191,36,0.6); transform: scale(1.1); }
+        .btn-choice { transition: all 0.15s; }
+        .btn-choice:hover:not(:disabled) { transform: scale(1.05); }
+        .btn-choice:disabled { opacity: 0.5; cursor: not-allowed; }
+        .correct-flash { animation: flashGreen 0.5s; }
+        .wrong-flash { animation: flashRed 0.5s; }
+        @keyframes flashGreen { 0%,100%{ background: inherit; } 50%{ background: #22c55e; color: #fff; } }
+        @keyframes flashRed { 0%,100%{ background: inherit; } 50%{ background: #ef4444; color: #fff; } }
+        @keyframes bounceIn { 0%{ transform: scale(0); } 50%{ transform: scale(1.2); } 100%{ transform: scale(1); } }
+        .bounce-in { animation: bounceIn 0.4s ease-out; }
+        @keyframes engineIdle { 0%, 100%{ transform: translateY(0px) translateX(0px); } 25%{ transform: translateY(-2px) translateX(1px); } 50%{ transform: translateY(1px) translateX(-1px); } 75%{ transform: translateY(-1px) translateX(0px); } }
+        .engine-idle { animation: engineIdle 0.1s infinite; }
+    </style>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/resizing_sdk.js" type="text/javascript"></script>
+ </head>
+ <body data-template-id="__page-root" class="w-full" style="min-height: calc(100 * min(var(--vh, 1vh), 1vh));"><!-- SETUP SCREEN -->
+  <div id="setup-screen" class="w-full flex flex-col items-center justify-center p-4 gap-4" style="min-height: calc(100 * min(var(--vh, 1vh), 1vh)); background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 100%);">
+   <h1 data-template-id="game-title" class="canva-text text-4xl font-extrabold text-yellow-300 drop-shadow-lg text-center"></h1>
+   <p data-template-id="game-subtitle" class="canva-text text-white text-lg text-center"></p><!-- Car Selection -->
+   <div class="bg-white/10 backdrop-blur rounded-2xl p-4 w-full max-w-2xl">
+    <h2 data-template-id="car-select-label" class="canva-text text-yellow-200 font-bold text-center mb-3"></h2>
+    <div class="grid grid-cols-2 gap-4">
+     <div>
+      <p data-template-id="p1-label" class="canva-text text-white text-center font-semibold mb-2"></p>
+      <div class="flex justify-center gap-2" id="p1-cars"></div>
+     </div>
+     <div>
+      <p data-template-id="p2-label" class="canva-text text-white text-center font-semibold mb-2"></p>
+      <div class="flex justify-center gap-2" id="p2-cars"></div>
+     </div>
+    </div>
+   </div><!-- Settings -->
+   <div class="bg-white/10 backdrop-blur rounded-2xl p-4 w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+     <h3 data-template-id="mode-label" class="canva-text text-yellow-200 font-bold mb-2"></h3>
+     <div class="flex flex-wrap gap-2" id="op-buttons"></div>
+    </div>
+    <div>
+     <h3 data-template-id="digit-label" class="canva-text text-yellow-200 font-bold mb-2"></h3>
+     <div class="flex gap-2" id="digit-buttons"></div>
+    </div>
+    <div><label class="text-white flex items-center gap-2"> <input type="checkbox" id="timer-toggle" class="w-5 h-5"> <span data-template-id="timer-label" class="canva-text"></span> </label> <input type="number" id="timer-seconds" class="mt-1 w-20 rounded px-2 py-1 text-sm" value="10" min="3" max="60" disabled> <span class="text-white text-sm ml-1">วินาที</span>
+    </div>
+    <div><label class="text-white flex items-center gap-2"> <input type="checkbox" id="penalty-toggle" class="w-5 h-5"> <span data-template-id="penalty-label" class="canva-text"></span> </label> <input type="number" id="penalty-seconds" class="mt-1 w-20 rounded px-2 py-1 text-sm" value="3" min="1" max="10" disabled> <span class="text-white text-sm ml-1">วินาที</span>
+    </div>
+   </div><button data-template-id="start-button" class="canva-button px-8 py-3 bg-yellow-400 text-gray-900 font-bold text-xl rounded-full hover:bg-yellow-300 shadow-lg" onclick="startGame()"></button>
+  </div><!-- GAME SCREEN -->
+  <div id="game-screen" class="w-full hidden" style="display: grid; grid-template-columns: 1fr 1fr 1fr; height: calc(100 * min(var(--vh, 1vh), 1vh)); background: linear-gradient(180deg, #87CEEB 0%, #228B22 100%);"><!-- LEFT: Player 1 Controls -->
+   <div class="flex flex-col bg-gradient-to-b from-red-900/80 to-red-800/60 border-r-4 border-yellow-400 p-3 gap-3 overflow-y-auto">
+    <div class="text-center">
+     <div class="text-2xl font-extrabold text-red-200">
+      P1
+     </div>
+     <div class="text-red-100 text-sm">
+      ผู้เล่น 1
+     </div>
+    </div>
+    <div class="bg-black/40 rounded-lg p-2">
+     <div class="text-yellow-300 font-bold text-lg text-center" id="score-p1-display">
+      0
+     </div>
+     <div class="text-red-100 text-xs text-center">
+      คะแนน
+     </div>
+    </div>
+    <div class="text-center text-sm text-red-100">
+     คำตอบของคุณ
+    </div>
+    <div class="grid grid-cols-2 gap-2" id="choices-p1"></div>
+   </div><!-- CENTER: Questions + Race Track -->
+   <div class="flex flex-col border-r-4 border-l-4 border-yellow-400"><!-- Question Display -->
+    <div class="bg-black/50 px-4 py-3 text-center border-b-2 border-yellow-400">
+     <div class="text-yellow-300 font-extrabold text-2xl" id="question-display">
+      1 + 1 = ?
+     </div>
+     <div class="text-white text-xs mt-1" id="q-counter">
+      ข้อ 1/20
+     </div>
+     <div class="text-orange-300 text-sm font-bold hidden" id="timer-display">
+      ⏱ 10s
+     </div>
+    </div><!-- Canvas Track -->
+    <div class="flex-1 relative">
+     <canvas id="race-canvas" class="w-full h-full"></canvas>
+    </div><!-- Race Status -->
+    <div class="bg-black/50 px-4 py-2 text-center border-t-2 border-yellow-400">
+     <div class="text-white text-sm font-semibold">
+      <span class="text-red-300" id="p1-status">รอคำตอบ</span> <span class="mx-2">·</span> <span class="text-blue-300" id="p2-status">รอคำตอบ</span>
+     </div>
+    </div>
+   </div><!-- RIGHT: Player 2 Controls -->
+   <div class="flex flex-col bg-gradient-to-b from-blue-900/80 to-blue-800/60 border-l-4 border-yellow-400 p-3 gap-3 overflow-y-auto">
+    <div class="text-center">
+     <div class="text-2xl font-extrabold text-blue-200">
+      P2
+     </div>
+     <div class="text-blue-100 text-sm">
+      ผู้เล่น 2
+     </div>
+    </div>
+    <div class="bg-black/40 rounded-lg p-2">
+     <div class="text-yellow-300 font-bold text-lg text-center" id="score-p2-display">
+      0
+     </div>
+     <div class="text-blue-100 text-xs text-center">
+      คะแนน
+     </div>
+    </div>
+    <div class="text-center text-sm text-blue-100">
+     คำตอบของคุณ
+    </div>
+    <div class="grid grid-cols-2 gap-2" id="choices-p2"></div>
+   </div><!-- Mute button --> <button id="mute-btn" class="absolute top-2 right-2 z-50 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm" onclick="toggleMute()">🔊</button>
+  </div><!-- RESULT SCREEN -->
+  <div id="result-screen" class="w-full hidden flex-col items-center justify-center gap-6" style="min-height: calc(100 * min(var(--vh, 1vh), 1vh)); background: linear-gradient(135deg, #1e3a5f 0%, #4c1d95 100%);">
+   <h1 class="text-5xl font-extrabold text-yellow-300 bounce-in" id="winner-text">🏆</h1>
+   <div class="text-white text-xl" id="final-scores"></div><button data-template-id="replay-button" class="canva-button px-8 py-3 bg-yellow-400 text-gray-900 font-bold text-xl rounded-full hover:bg-yellow-300" onclick="resetGame()"></button>
+  </div>
+  <script src="/_sdk/editing_sdk.js"></script>
+  <script>
+// Game State
+const CAR_COLORS = ['#e53e3e','#3b82f6','#10b981','#f59e0b'];
+let config = { ops: ['+'], digits: 1, timer: false, timerSec: 10, penalty: false, penaltySec: 3 };
+let p1Car = 0, p2Car = 1;
+let questions = [], currentQ = 0, scores = [0,0], answered = [false,false];
+let timerInterval = null, timeLeft = 0;
+let audioCtx = null, bgOsc = null, muted = false;
+let carPositions = [0, 0]; // 0-100 percent
+
+// Setup car selection
+function initSetup() {
+    ['p1-cars','p2-cars'].forEach((id, pi) => {
+        const div = document.getElementById(id);
+        CAR_COLORS.forEach((c, i) => {
+            const el = document.createElement('div');
+            el.className = 'car-option' + (pi === 0 && i === 0 ? ' selected' : '') + (pi === 1 && i === 1 ? ' selected' : '');
+            el.style.background = c;
+            el.style.width = '40px'; el.style.height = '40px'; el.style.borderRadius = '8px';
+            el.onclick = () => {
+                div.querySelectorAll('.car-option').forEach(e => e.classList.remove('selected'));
+                el.classList.add('selected');
+                if(pi===0) p1Car=i; else p2Car=i;
+            };
+            div.appendChild(el);
+        });
+    });
+
+    // Op buttons
+    const ops = ['+','-','×','÷'];
+    const opDiv = document.getElementById('op-buttons');
+    ops.forEach(op => {
+        const btn = document.createElement('button');
+        btn.textContent = op;
+        btn.className = 'px-3 py-1 rounded font-bold ' + (op==='+' ? 'bg-yellow-400 text-gray-900' : 'bg-white/20 text-white');
+        btn.onclick = () => {
+            btn.classList.toggle('bg-yellow-400'); btn.classList.toggle('text-gray-900');
+            btn.classList.toggle('bg-white/20'); btn.classList.toggle('text-white');
+            updateOps();
+        };
+        opDiv.appendChild(btn);
+    });
+
+    // Digit buttons
+    const digDiv = document.getElementById('digit-buttons');
+    [1,2,3].forEach(d => {
+        const btn = document.createElement('button');
+        btn.textContent = d + ' หลัก';
+        btn.className = 'px-3 py-1 rounded font-bold ' + (d===1 ? 'bg-yellow-400 text-gray-900' : 'bg-white/20 text-white');
+        btn.onclick = () => {
+            digDiv.querySelectorAll('button').forEach(b => { b.className = 'px-3 py-1 rounded font-bold bg-white/20 text-white'; });
+            btn.className = 'px-3 py-1 rounded font-bold bg-yellow-400 text-gray-900';
+            config.digits = d;
+        };
+        digDiv.appendChild(btn);
+    });
+
+    document.getElementById('timer-toggle').onchange = e => {
+        config.timer = e.target.checked;
+        document.getElementById('timer-seconds').disabled = !e.target.checked;
+    };
+    document.getElementById('penalty-toggle').onchange = e => {
+        config.penalty = e.target.checked;
+        document.getElementById('penalty-seconds').disabled = !e.target.checked;
+    };
+}
+
+function updateOps() {
+    const btns = document.getElementById('op-buttons').querySelectorAll('button');
+    const ops = ['+','-','×','÷'];
+    config.ops = [];
+    btns.forEach((b,i) => { if(b.classList.contains('bg-yellow-400')) config.ops.push(ops[i]); });
+    if(config.ops.length === 0) config.ops = ['+'];
+}
+
+// Question generation
+function genNum(digits) {
+    const min = digits === 1 ? 1 : Math.pow(10, digits-1);
+    const max = Math.pow(10, digits) - 1;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateQuestions() {
+    questions = [];
+    for(let i = 0; i < 20; i++) {
+        const op = config.ops[Math.floor(Math.random() * config.ops.length)];
+        let a = genNum(config.digits), b = genNum(config.digits), answer;
+        if(op === '-') { if(a < b) [a,b] = [b,a]; answer = a - b; }
+        else if(op === '+') answer = a + b;
+        else if(op === '×') { if(config.digits > 1) { a = genNum(1); } answer = a * b; }
+        else { answer = a; a = a * b; } // division: a÷b = answer
+        
+        const text = op === '÷' ? `${a} ÷ ${b} = ?` : `${a} ${op} ${b} = ?`;
+        const choices = generateChoices(answer);
+        questions.push({ text, answer, choices });
+    }
+}
+
+function generateChoices(answer) {
+    const set = new Set([answer]);
+    while(set.size < 4) {
+        const offset = Math.floor(Math.random() * 10) - 5;
+        if(offset !== 0) set.add(answer + offset);
+    }
+    return [...set].sort(() => Math.random() - 0.5);
+}
+
+// Audio
+function initAudio() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    playBgMusic();
+}
+
+function playBgMusic() {
+    if(!audioCtx || muted) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = 220;
+    gain.gain.value = 0.05;
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start();
+    bgOsc = { osc, gain };
+    // Simple melody loop
+    let t = audioCtx.currentTime;
+    const notes = [262,294,330,349,392,349,330,294];
+    notes.forEach((n,i) => { osc.frequency.setValueAtTime(n, t + i*0.5); });
+    setInterval(() => {
+        if(muted) return;
+        let t2 = audioCtx.currentTime;
+        notes.forEach((n,i) => { osc.frequency.setValueAtTime(n, t2 + i*0.5); });
+    }, 4000);
+}
+
+function playSound(type) {
+    if(!audioCtx || muted) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    gain.gain.value = 0.15;
+    if(type === 'correct') { osc.frequency.value = 523; osc.type = 'sine'; }
+    else if(type === 'wrong') { osc.frequency.value = 150; osc.type = 'sawtooth'; }
+    else { osc.frequency.value = 880; osc.type = 'sine'; }
+    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+}
+
+function toggleMute() {
+    muted = !muted;
+    document.getElementById('mute-btn').textContent = muted ? '🔇' : '🔊';
+    if(bgOsc) bgOsc.gain.gain.value = muted ? 0 : 0.05;
+}
+
+// Game Logic
+function startGame() {
+    config.timerSec = parseInt(document.getElementById('timer-seconds').value) || 10;
+    config.penaltySec = parseInt(document.getElementById('penalty-seconds').value) || 3;
+    updateOps();
+    generateQuestions();
+    scores = [0,0]; currentQ = 0; carPositions = [0,0];
+    
+    document.getElementById('setup-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('game-screen').style.display = 'flex';
+    
+    initAudio();
+    resizeCanvas();
+    showQuestion();
+    requestAnimationFrame(drawLoop);
+}
+
+function showQuestion() {
+    if(currentQ >= 20) { endGame(); return; }
+    answered = [false, false];
+    const q = questions[currentQ];
+    document.getElementById('question-display').textContent = q.text;
+    document.getElementById('q-counter').textContent = `ข้อ ${currentQ+1}/20`;
+    document.getElementById('score-p1-display').textContent = scores[0];
+    document.getElementById('score-p2-display').textContent = scores[1];
+    document.getElementById('p1-status').textContent = 'รอคำตอบ';
+    document.getElementById('p2-status').textContent = 'รอคำตอบ';
+
+    ['choices-p1','choices-p2'].forEach((id, pi) => {
+        const div = document.getElementById(id);
+        div.innerHTML = '';
+        q.choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.textContent = c;
+            btn.className = 'btn-choice px-2 py-3 rounded-lg font-bold text-lg ' + (pi===0 ? 'bg-red-100 hover:bg-red-200 text-red-900' : 'bg-blue-100 hover:bg-blue-200 text-blue-900');
+            btn.onclick = () => handleAnswer(pi, c, btn);
+            div.appendChild(btn);
+        });
+    });
+
+    if(config.timer) {
+        timeLeft = config.timerSec;
+        document.getElementById('timer-display').classList.remove('hidden');
+        document.getElementById('timer-display').textContent = `⏱ ${timeLeft}s`;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-display').textContent = `⏱ ${timeLeft}s`;
+            if(timeLeft <= 0) { clearInterval(timerInterval); nextQuestion(); }
+        }, 1000);
+    }
+}
+
+function handleAnswer(player, choice, btn) {
+    if(answered[player]) return;
+    answered[player] = true;
+    const q = questions[currentQ];
+    const div = document.getElementById(player === 0 ? 'choices-p1' : 'choices-p2');
+    div.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    if(choice === q.answer) {
+        scores[player]++;
+        carPositions[player] = Math.min(100, carPositions[player] + 5);
+        btn.classList.add('correct-flash');
+        playSound('correct');
+        document.getElementById(player===0?'score-p1-display':'score-p2-display').textContent = scores[player];
+        document.getElementById(player===0?'p1-status':'p2-status').textContent = '✓ ถูก!';
+        clearInterval(timerInterval);
+        setTimeout(nextQuestion, 600);
+    } else {
+        btn.classList.add('wrong-flash');
+        playSound('wrong');
+        document.getElementById(player===0?'p1-status':'p2-status').textContent = '✗ ผิด';
+        if(config.penalty && config.timer) {
+            timeLeft += config.penaltySec;
+        }
+        // If both answered, go next
+        if(answered[0] && answered[1]) { clearInterval(timerInterval); setTimeout(nextQuestion, 600); }
+    }
+}
+
+function nextQuestion() {
+    currentQ++;
+    showQuestion();
+}
+
+function endGame() {
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('game-screen').style.display = 'none';
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('result-screen').style.display = 'flex';
+    const w = scores[0] > scores[1] ? 'ผู้เล่น 1 ชนะ! 🏆' : scores[1] > scores[0] ? 'ผู้เล่น 2 ชนะ! 🏆' : 'เสมอ! 🤝';
+    document.getElementById('winner-text').textContent = w;
+    document.getElementById('final-scores').textContent = `P1: ${scores[0]} - P2: ${scores[1]}`;
+    if(bgOsc) { bgOsc.osc.stop(); bgOsc = null; }
+    playSound('win');
+}
+
+function resetGame() {
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('setup-screen').classList.remove('hidden');
+}
+
+// Canvas Drawing
+let canvas, ctx;
+function resizeCanvas() {
+    canvas = document.getElementById('race-canvas');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx = canvas.getContext('2d');
+}
+window.addEventListener('resize', resizeCanvas);
+
+function drawLoop() {
+    if(!ctx) { requestAnimationFrame(drawLoop); return; }
+    const W = canvas.width, H = canvas.height;
+    // Sky + grass
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(0, 0, W * 0.4, H);
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(W * 0.4, 0, W * 0.6, H);
+
+    // Vertical Road (left to right, cars move up)
+    const roadX = W * 0.35, roadW = W * 0.5;
+    ctx.fillStyle = '#444';
+    ctx.fillRect(roadX, 0, roadW, H);
+    // Lane line (vertical center)
+    ctx.setLineDash([20, 15]);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(roadX + roadW/2, 0);
+    ctx.lineTo(roadX + roadW/2, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Finish line (top, horizontal)
+    ctx.fillStyle = '#fff';
+    for(let i = 0; i < 10; i++) {
+        ctx.fillRect(roadX + i * (roadW/10), 30, roadW/20, 15);
+    }
+
+    // Cars (moving vertically upward)
+    // P1 car on left lane, P2 car on right lane
+    drawCarVertical(roadX + roadW * 0.2, H - (carPositions[0] / 100 * (H - 100)), CAR_COLORS[p1Car], !answered[0]);
+    drawCarVertical(roadX + roadW * 0.6, H - (carPositions[1] / 100 * (H - 100)), CAR_COLORS[p2Car], !answered[1]);
+
+    // Clouds
+    drawCloud(W * 0.1, H * 0.2);
+    drawCloud(W * 0.12, H * 0.5);
+    drawCloud(W * 0.08, H * 0.75);
+
+    requestAnimationFrame(drawLoop);
+}
+
+function drawCarVertical(x, y, color, isWaiting) {
+    // Apply engine idle shake if waiting for answer
+    let shakeX = 0, shakeY = 0;
+    if(isWaiting) {
+        const t = Date.now() % 100;
+        const phase = (t / 100) * Math.PI * 2;
+        shakeX = Math.sin(phase) * 2;
+        shakeY = Math.cos(phase * 2) * 1.5;
+    }
+    
+    const finalX = x + shakeX;
+    const finalY = y + shakeY;
+    
+    // Body (horizontal orientation)
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(finalX - 30, finalY - 12, 60, 25, 6);
+    ctx.fill();
+    // Roof
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(finalX - 15, finalY - 26, 30, 14, 4);
+    ctx.fill();
+    // Windows
+    ctx.fillStyle = '#a0d8ef';
+    ctx.fillRect(finalX - 13, finalY - 24, 11, 10);
+    ctx.fillRect(finalX + 1, finalY - 24, 11, 10);
+    // Wheels (top and bottom)
+    ctx.fillStyle = '#222';
+    ctx.beginPath(); ctx.arc(finalX - 15, finalY - 35, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(finalX + 15, finalY - 35, 6, 0, Math.PI*2); ctx.fill();
+}
+
+function drawCloud(x, y) {
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI*2);
+    ctx.arc(x+18, y-5, 12, 0, Math.PI*2);
+    ctx.arc(x+30, y, 15, 0, Math.PI*2);
+    ctx.fill();
+}
+
+// Init
+initSetup();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0e0834ed3a1c0b1',t:'MTc4MTg1MDkxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,38 +1,26 @@
 <template>
-  <main class="w-full min-h-screen bg-slate-950 text-white font-sans">
-    
-    <MainMenu 
-      v-if="currentScene === 'menu'" 
-      @start-game="handleStartGame" 
-    />
-
-    <GameScreen 
-      v-if="currentScene === 'game'" 
-      :config="gameConfig" 
-      @back-to-menu="currentScene = 'menu'" 
-    />
-
-  </main>
+  <div id="app">
+    <MainMenu v-if="currentScene === 'menu'" @start-game="handleStartGame" @start-racing="handleStartRacing" />
+    <GameScreen v-else-if="currentScene === 'game'" :config="gameConfig" @back-to-menu="currentScene = 'menu'" />
+    <RacingGameScreen v-else-if="currentScene === 'racing'" :config="gameConfig" @back-to-menu="currentScene = 'menu'" />
+  </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
 import MainMenu from './components/MainMenu.vue'
 import GameScreen from './components/GameScreen.vue'
+import RacingGameScreen from './components/RacingGameScreen.vue'
 
 const currentScene = ref('menu') 
-const gameConfig = reactive({
-  subject: '',
-  grade: '', // เพิ่มตัวแปรระดับชั้น
-  level: '',
-  lesson: 'all'
-})
+const gameConfig = reactive({ subject: '', grade: '', level: '', lesson: 'all' })
 
 const handleStartGame = (config) => {
-  gameConfig.subject = config.subject
-  gameConfig.grade = config.grade // รับค่าระดับชั้น
-  gameConfig.level = config.level
-  gameConfig.lesson = config.lesson 
+  Object.assign(gameConfig, config)
   currentScene.value = 'game' 
+}
+
+const handleStartRacing = () => {
+  currentScene.value = 'racing' 
 }
 </script>

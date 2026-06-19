@@ -110,6 +110,17 @@ const gameEnded = ref(false)
 const isLoading = ref(true)
 const endMessage = ref("หมดเวลา!")
 
+// ใช้ลิงก์ GitHub ของคุณเอสเป็นฐาน (ตัดคำว่า /images/... ข้างหลังออก)
+const githubBaseUrl = "https://raw.githubusercontent.com/escmon/lenARgame/main/public"
+
+// ฟังก์ชันแปลงลิงก์รูปภาพ
+const getFullImageUrl = (path) => {
+  if (!path) return ''
+  // ถ้าเจอคำว่า /images/ ให้เอาลิงก์ GitHub แปะเข้าไปข้างหน้า
+  if (path.startsWith('/images/')) return githubBaseUrl + path
+  return path
+}
+
 const isTransitioning = ref(false)
 const isPaused = ref(false) // สถานะหยุดเวลาเมื่อซูมรูปภาพ
 const showZoom = ref(false)
@@ -213,19 +224,17 @@ const nextQuestion = () => {
 
   grabbedIndex = null
   
+  // --- กรณีเป็นโหมดจับคู่คำศัพท์ (Vocab) ---
   if (props.config.level === 'vocab') {
     const randomIndex = Math.floor(Math.random() * questionsDb.value.length)
-    const selectedObj = questionsDb.value.splice(randomIndex, 1)[0] // ตัดข้อที่ใช้ออก เพื่อไม่ให้ซ้ำ
+    const selectedObj = questionsDb.value.splice(randomIndex, 1)[0]
     const correctWord = selectedObj.word
     
-    // สุ่มตัวเลือกผิดจากฐานข้อมูลที่เหลือ (หรือจาก copy ของฐานข้อมูล) เพื่อไม่ให้ error กรณีคำหมด
-    // (หมายเหตุ: ในเกมจริงเราใช้ array เดิมเพื่อสุ่มตัวเลือกหลอก แต่ไม่นำออก)
     let wrong1 = correctWord, wrong2 = correctWord
     if (questionsDb.value.length > 2) {
       while(wrong1 === correctWord) wrong1 = questionsDb.value[Math.floor(Math.random() * questionsDb.value.length)].word
       while(wrong2 === correctWord || wrong2 === wrong1) wrong2 = questionsDb.value[Math.floor(Math.random() * questionsDb.value.length)].word
     } else {
-      // Fallback ถ้าคำศัพท์ใกล้หมด
       wrong1 = "apple"
       wrong2 = "banana"
     }
@@ -233,30 +242,33 @@ const nextQuestion = () => {
     const isTextQuestion = Math.random() > 0.5
     let choices = [correctWord, wrong1, wrong2].sort(() => Math.random() - 0.5)
     
+    // ตรงนี้ใช้ getFullImageUrl ครอบลิงก์รูปภาพตัวเลือก
     let mappedChoices = choices.map(w => ({
       type: isTextQuestion ? 'image' : 'text',
-      content: isTextQuestion ? `/images/vocab/${encodeURIComponent(w)}.png` : w,
+      content: isTextQuestion ? getFullImageUrl(`/images/vocab/${encodeURIComponent(w)}.png`) : w,
       value: w 
     }))
 
     currentQuestion.value = {
       qType: isTextQuestion ? 'text' : 'image',
-      qText: isTextQuestion ? correctWord : `/images/vocab/${encodeURIComponent(correctWord)}.png`,
+      qText: isTextQuestion ? correctWord : getFullImageUrl(`/images/vocab/${encodeURIComponent(correctWord)}.png`),
       a: correctWord,
       c: mappedChoices
     }
+
+  // --- กรณีเป็นโหมดวิชาปกติ (อนุบาล-ประถม-มัธยม) ---
   } else {
-    // โหมดวิชาทั่วไป (ดึงแล้วตัดออก)
     const randomIndex = Math.floor(Math.random() * questionsDb.value.length)
     const rawData = questionsDb.value.splice(randomIndex, 1)[0] 
     
+    // ตรงนี้ใช้ getFullImageUrl ครอบลิงก์รูปภาพโจทย์ (สำหรับอนุบาล)
     currentQuestion.value = {
-      qType: rawData.img ? 'image' : 'text', // รองรับรูปภาพสำหรับอนุบาล
-      qText: rawData.img ? rawData.img : rawData.q,
+      qType: rawData.img ? 'image' : 'text',
+      qText: rawData.img ? getFullImageUrl(rawData.img) : rawData.q,
       a: rawData.a,
       c: rawData.c.map(text => ({ 
         type: (text.includes('.png') || text.includes('.jpg')) ? 'image' : 'text', 
-        content: text, 
+        content: (text.includes('.png') || text.includes('.jpg')) ? getFullImageUrl(text) : text, 
         value: text 
       }))
     }

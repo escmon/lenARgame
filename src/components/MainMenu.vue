@@ -46,6 +46,14 @@
           <button v-if="activeSubjectId === 'english'" @click="selectVocabMode" class="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-indigo-400">
             🖼️ โหมดจับคู่ภาพคำศัพท์ (รวม)
           </button>
+
+          <button @click="$emit('start-racing')" class="w-full py-3 mt-2 bg-orange-500 hover:bg-orange-400 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-orange-300">
+            🚗 Racing | Fast เร็วทะลุจอ
+          </button>
+
+          <button @click="$emit('start-sorting')" class="w-full py-3 mt-2 bg-orange-500 hover:bg-orange-400 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-orange-300">
+            🧩 โหมดเรียงลำดับ (น้อย-มาก / เล็ก-ใหญ่)
+          </button>
           <button @click="closeModal" class="pt-2 text-slate-400 hover:text-white text-sm font-medium transition-colors cursor-pointer">ยกเลิก</button>
         </div>
 
