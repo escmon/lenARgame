@@ -242,90 +242,82 @@ const onResults = (results) => {
   if (hasHands && isPlaying.value) {
     const landmarks = results.multiHandLandmarks[0]
     
-    // วงกลมชี้เป้าแบบใหม่ ป้องกันค้าง
-    const indexTip = landmarks[8]
-    const thumb = landmarks[4]
-    
+    // 🔥 เอามือโครงกระดูกกลับมาแล้วครับ! คราวนี้ไม่ค้างแน่นอน
+    if (window.drawConnectors && window.drawLandmarks) {
+      window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {color: 'rgba(34, 211, 238, 0.6)', lineWidth: 3})
+      window.drawLandmarks(ctx, landmarks, {color: '#facc15', lineWidth: 1, radius: 3})
+    }
+
+    // จุดเช็คการ "กำมือ" (วัดระยะห่างระหว่างนิ้วชี้และนิ้วโป้ง)
+    const thumb = landmarks[4], indexTip = landmarks[8]
     const cursorX = window.innerWidth - (indexTip.x * window.innerWidth)
     const cursorY = indexTip.y * window.innerHeight
     const distance = Math.hypot((thumb.x - indexTip.x) * window.innerWidth, (thumb.y - indexTip.y) * window.innerHeight)
     
+    // ตั้งค่าความยากง่ายในการกำมือหยิบ
     const grabThreshold = window.innerWidth < 768 ? 30 : 40
-    isHandGrabbing = distance < grabThreshold
 
-    ctx.restore(); ctx.save(); ctx.beginPath(); 
-    ctx.arc(window.innerWidth - cursorX, cursorY, 15, 0, 2 * Math.PI)
-    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'
-    ctx.shadowBlur = 10; ctx.shadowColor = '#000'; ctx.fill(); ctx.restore()
+    if (distance < grabThreshold) { 
+      isHandGrabbing = true // กำมือ = หยิบ
+    } else if (distance > grabThreshold + 20) {
+      isHandGrabbing = false // แบมือ = ปล่อย
+      if (grabbedIndex !== null && !isTransitioning.value && !isPaused.value) {
+        // ถ้าปล่อยมือกลางอากาศ ของจะลอยเด้งกลับไปที่เดิม
+        const el = document.getElementById(`choice-${grabbedIndex}`)
+        if (el) { el.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; el.style.left = `${choicePositions[grabbedIndex].x * window.innerWidth}px`; el.style.top = `${choicePositions[grabbedIndex].y * window.innerHeight}px` }
+        choiceClasses.value[grabbedIndex] = currentChoices.value[grabbedIndex].type === 'image' ? 'bg-transparent border-transparent' : 'bg-slate-900/80 text-cyan-300 border-2 border-cyan-500/50 shadow-lg'
+        grabbedIndex = null
+      }
+    }
+
+    // วาดเป้าตรงปลายนิ้วชี้
+    ctx.save(); ctx.scale(-1, 1); ctx.translate(-canvasElement.value.width, 0); ctx.beginPath(); ctx.arc(window.innerWidth - cursorX, cursorY, 14, 0, 2 * Math.PI)
+    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'; ctx.shadowColor = isHandGrabbing ? '#4ade80' : '#facc15'; ctx.shadowBlur = 15; ctx.fill(); ctx.restore()
 
     if (isHandGrabbing && !isTransitioning.value && !isPaused.value) {
       if (grabbedIndex === null) {
         for (let i = 0; i < 3; i++) {
           if (checkCollision(cursorX, cursorY, `choice-${i}`)) {
-            grabbedIndex = i; playGrab()
-            choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-110 z-50'
+            // จับโดนของแล้ว!
+            grabbedIndex = i; const el = document.getElementById(`choice-${grabbedIndex}`); if (el) el.style.transition = 'none'; playGrab()
+            choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-110 md:scale-125 z-50'
             break
           }
         }
       } else {
+        // 🔥 จังหวะนี้แหละครับ คือการ Drag (ลากของให้ขยับตามมือ)
         const el = document.getElementById(`choice-${grabbedIndex}`)
         const offset = window.innerWidth < 768 ? 40 : 80
         if (el) { el.style.left = `${cursorX - offset}px`; el.style.top = `${cursorY - offset}px` }
         
-        // 🔥 แก้ไข Bug ขวาล่าง: เช็คโซนแบบ Loop เพื่อความเสถียร
-        const zones = ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br'];
-        let matchedZone = null;
+        let matchedZone = null
+        if (checkCollision(cursorX, cursorY, 'zone-tl')) matchedZone = 'zone-tl'
+        if (checkCollision(cursorX, cursorY, 'zone-tr')) matchedZone = 'zone-tr'
+        if (checkCollision(cursorX, cursorY, 'zone-bl')) matchedZone = 'zone-bl'
+        if (checkCollision(cursorX, cursorY, 'zone-br')) matchedZone = 'zone-br'
 
-        for (const zId of zones) {
-          if (checkCollision(cursorX, cursorY, zId)) {
-            matchedZone = zId;
-            break; // เจอโซนแรกที่ชนให้หยุดเช็คทันที
-          }
-        }
+        ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br'].forEach(id => { const z = document.getElementById(id); if(z) z.classList.remove('corner-active') })
 
         if (matchedZone && !isTransitioning.value) {
+          // ลากไปวางลงหลุมสำเร็จ (Drop)
+          isTransitioning.value = true; 
           const activeEl = document.getElementById(matchedZone);
-          if (activeEl) {
-            isTransitioning.value = true;
-            activeEl.classList.add('corner-active');
-            
-            if (currentChoices.value[grabbedIndex].value === currentQuestion.value.a) { 
-              score.value += 10; showToast("ถูกต้อง! 🌟", 'correct'); playCorrect() 
-            } else { 
-              showToast("ไม่ถูกต้อง ❌", 'wrong'); playWrong() 
-            }
-            if (el) el.style.display = 'none'
+          if (activeEl) activeEl.classList.add('corner-active')
 
-            setTimeout(() => { 
-              isTransitioning.value = false;
-              // ล้างสถานะทุกโซนป้องกันค้าง
-              zones.forEach(id => {
-                const z = document.getElementById(id);
-                if (z) z.classList.remove('corner-active');
-              });
-              nextQuestion(); 
-            }, 2000)
-          }
+          if (currentChoices.value[grabbedIndex].value === currentQuestion.value.a) { score.value += 10; showToast("ถูกต้อง! 🌟", 'correct'); playCorrect() } 
+          else { showToast("ไม่ถูกต้อง ❌", 'wrong'); playWrong() }
+          if (el) el.style.display = 'none'
+          setTimeout(() => { isTransitioning.value = false; nextQuestion() }, 3000)
         }
       }
     }
   }
+  ctx.restore()
 }
 
 onMounted(() => {
   canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight
   window.addEventListener('resize', () => { if(canvasElement.value) { canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight } })
-  
-  // 🔥 ดักจับเผื่อ WebGL มีปัญหา ให้มันรีเซ็ตตัวเองได้
-  canvasElement.value.addEventListener("webglcontextlost", (e) => {
-    e.preventDefault();
-    console.warn("WebGL Context Lost! กำลังกู้คืน...");
-  }, false);
-
-  canvasElement.value.addEventListener("webglcontextrestored", () => {
-    if(camera) camera.start();
-  }, false);
-
   fetchQuestions()
   hands = new window.Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`})
   hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 })
@@ -333,28 +325,7 @@ onMounted(() => {
   camera = new window.Camera(videoElement.value, { onFrame: async () => { if(videoElement.value) await hands.send({image: videoElement.value}) }, width: 640, height: 480, facingMode: 'user' })
   camera.start()
 })
-
-// 🔥 แก้ไข Bug จอดำ: เพิ่มคำสั่งล้างขยะ (Garbage Collection) ให้สะอาดหมดจด
-onUnmounted(async () => { 
-  clearInterval(timerInterval); 
-  
-  if (camera) {
-    await camera.stop();
-    camera = null;
-  }
-  
-  // คืนหน่วยความจำ AI ให้เครื่อง (ป้องกันโควต้า WebGL เต็ม)
-  if (hands) {
-    await hands.close(); 
-    hands = null;
-  }
-
-  // ล้างภาพออกจาก Canvas
-  if (canvasElement.value) {
-    const ctx = canvasElement.value.getContext('2d');
-    if (ctx) ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
-  }
-})
+onUnmounted(() => { clearInterval(timerInterval); if (camera) camera.stop(); if (hands) hands.close() })
 </script>
 
 <style scoped>
