@@ -82,11 +82,23 @@
 
       </div>
     </div>
+
+    <div class="mt-12 mb-8 text-center w-full flex flex-col items-center">
+      <p class="text-slate-500 text-sm font-medium mb-3">หากเล่นแล้วกล้องค้าง จอดำ หรือ WebGL Error</p>
+      <button @click="clearCache" class="px-6 py-3 bg-slate-800 hover:bg-red-700 border border-slate-600 hover:border-red-500 text-slate-300 hover:text-white rounded-full transition-all duration-300 shadow-lg text-sm font-bold flex items-center gap-2 cursor-pointer active:scale-95">
+        <span>🛠️ คลิกล้างแคชและรีสตาร์ทระบบกล้อง</span>
+      </button>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+
+const clearCache = () => {
+  window.location.reload(); // คำสั่งบังคับรีเฟรช ล้างแรม GPU ทันที
+}
 
 // หัวใจสำคัญที่ทำให้กดปุ่มแล้วเปิดติด คือการประกาศชื่อคำสั่งให้ครบตรงนี้ครับ!
 const emit = defineEmits(['start-game', 'start-racing', 'start-sorting'])

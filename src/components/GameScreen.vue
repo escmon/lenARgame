@@ -90,12 +90,27 @@
       <div class="text-2xl md:text-4xl font-black text-cyan-400 mb-4 animate-pulse">กำลังเตรียมระบบ AR...</div>
       <p class="text-sm md:text-base text-slate-400">กรุณาอนุญาตให้เบราว์เซอร์ใช้งานกล้อง</p>
     </div>
+
+    <div v-if="webglError" class="absolute inset-0 z-1000 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center pointer-events-auto backdrop-blur-sm">
+      <div class="text-7xl mb-6 animate-bounce">⚠️</div>
+      <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-4">หน่วยความจำกล้องเต็ม</h2>
+      <p class="text-slate-300 text-lg md:text-2xl mb-8">ระบบตรวจพบ WebGL Error (อาการจอดำ)<br>กรุณากดปุ่มด้านล่างเพื่อล้างแคชครับ</p>
+      <button @click="clearCache" class="px-10 py-4 bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-2xl text-2xl font-bold shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all cursor-pointer">
+        🛠️ ล้างแคชและรีสตาร์ท
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAudio } from '../composables/useAudio' 
+
+const webglError = ref(false)
+
+const clearCache = () => {
+  window.location.reload();
+}
 
 const props = defineProps({ config: Object })
 const emit = defineEmits(['back-to-menu'])
@@ -430,10 +445,12 @@ onMounted(() => {
   window.addEventListener('resize', () => { if(canvasElement.value) { canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight } })
   
   // 🔥 ดักจับเผื่อ WebGL มีปัญหา ให้มันรีเซ็ตตัวเองได้
-  canvasElement.value.addEventListener("webglcontextlost", (e) => {
-    e.preventDefault();
-    console.warn("WebGL Context Lost! กำลังกู้คืน...");
-  }, false);
+  // เปลี่ยนจากของเดิม ให้กลายเป็นเปิดหน้าจอ webglError.value = true
+  canvasElement.value.addEventListener("webglcontextlost", (e) => { 
+    e.preventDefault(); 
+    console.warn("WebGL Context Lost!");
+    webglError.value = true; // <--- โชว์ป้ายเตือนทันทีที่จอดำ
+  }, false)
 
   canvasElement.value.addEventListener("webglcontextrestored", () => {
     if(camera) camera.start();
