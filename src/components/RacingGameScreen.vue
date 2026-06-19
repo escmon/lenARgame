@@ -132,7 +132,7 @@ const webglError = ref(false)
 const clearCache = () => {
   window.location.reload();
 }
-
+const gameContainer = ref(null)
 const toggleFullScreen = () => {
   const elem = gameContainer.value || document.documentElement;
   if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));

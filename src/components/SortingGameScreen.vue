@@ -1,102 +1,69 @@
 <template>
   <div ref="gameContainer" class="relative w-full h-dvh overflow-hidden bg-slate-950 select-none font-sarabun">
     
-    <div class="portrait-lock fixed inset-0 z-999 bg-slate-900 flex flex-col items-center justify-center text-center p-6">
-      <div class="text-7xl mb-6 animate-bounce">📱🔄</div>
-      <h2 class="text-3xl md:text-5xl font-black text-white mb-4">กรุณาหมุนหน้าจอ</h2>
-      <p class="text-slate-400 text-lg md:text-2xl">โปรดหมุนอุปกรณ์เป็น "แนวนอน" <br>เพื่อให้กล้อง AR จับภาพมือได้กว้างที่สุดครับ</p>
-    </div>
-
     <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none -z-10" autoplay playsinline></video>
     <canvas ref="canvasElement" class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"></canvas>
 
-    <div class="absolute top-0 inset-x-0 p-4 md:p-6 flex justify-between items-start pointer-events-none z-10">
-      <div class="bg-slate-900/80 backdrop-blur-md px-4 md:px-6 py-2 md:py-3 rounded-2xl border border-white/20 text-center shadow-xl">
-        <p class="text-[10px] md:text-sm text-yellow-400 font-bold uppercase">SCORE</p>
-        <h2 class="text-2xl md:text-4xl font-black text-white">{{ score }}</h2>
+    <div class="absolute top-0 inset-x-0 p-4 flex justify-between items-start z-10 pointer-events-none">
+      <div class="bg-slate-900/80 px-6 py-2 rounded-2xl border-2 border-yellow-400 shadow-xl text-center pointer-events-auto">
+        <p class="text-xs text-yellow-200 font-bold">คะแนน</p>
+        <h2 class="text-3xl font-black text-white">{{ score }}</h2>
       </div>
       
-      <div class="bg-slate-900/90 backdrop-blur-md px-6 md:px-12 py-3 md:py-4 rounded-3xl border-b-4 border-cyan-400 text-center shadow-2xl transition-all duration-300 pointer-events-auto">
-        <p class="text-xs md:text-sm text-cyan-400 font-bold mb-1">หมวดเรียงลำดับ (อนุบาล)</p>
-        <h1 class="text-2xl md:text-4xl font-black text-white tracking-wide">{{ currentQuestion.instruction }}</h1>
-        <p v-if="isTransitioning" class="text-yellow-400 text-xs md:text-base font-bold mt-1 md:mt-2 animate-pulse">เยี่ยมมาก! กำลังไปข้อถัดไป...</p>
-      </div>
-
-      <button @click="$emit('back-to-menu')" class="bg-slate-900/80 backdrop-blur-md px-4 md:px-6 py-2 md:py-3 rounded-2xl border border-red-500/50 text-red-400 font-bold shadow-xl pointer-events-auto hover:bg-red-500 hover:text-white transition-colors cursor-pointer">
-        ออก
-      </button>
-    </div>
-
-    <div class="absolute top-1/2 -translate-y-1/2 inset-x-0 flex justify-center gap-2 md:gap-8 z-10 pointer-events-none px-2">
-      <div v-for="(zone, index) in 4" :key="'zone-'+index" :id="'drop-zone-'+index"
-           class="drop-zone w-18.75 h-18.75 sm:w-24 sm:h-24 md:w-40 md:h-40 border-2 md:border-4 border-dashed rounded-2xl md:rounded-3xl flex flex-col items-center justify-center transition-all duration-300"
-           :class="placedItems[index] ? 'border-green-400 bg-green-400/20 shadow-[0_0_20px_rgba(74,222,128,0.5)]' : 'border-white/40 bg-black/40'">
-        
-        <div v-if="placedItems[index]" class="w-full h-full flex items-center justify-center animate-bounce-in">
-          <span v-if="placedItems[index].type === 'text'" class="text-4xl md:text-7xl font-black text-white drop-shadow-lg">{{ placedItems[index].content }}</span>
-          <span v-else-if="placedItems[index].type === 'emoji'" :style="{ fontSize: (placedItems[index].size * 0.7) + 'px' }" class="drop-shadow-lg md:scale-125">{{ placedItems[index].content }}</span>
-        </div>
-        <span v-else class="text-white/20 text-3xl md:text-6xl font-black">{{ index + 1 }}</span>
-      </div>
-    </div>
-
-    <div id="items-layer" class="absolute inset-0 pointer-events-none z-20">
-      <div v-for="(item, index) in activeItems" :key="'item-'+item.id" :id="'drag-item-'+index"
-           class="drag-item absolute flex items-center justify-center transition-transform duration-200"
-           :class="[item.isDragging ? 'scale-125 z-50' : 'scale-100 z-20', !item.isPlaced ? 'opacity-100' : 'opacity-0 pointer-events-none']"
-           :style="{ left: item.x + 'px', top: item.y + 'px', transition: item.isDragging ? 'none' : 'all 0.4s ease' }">
-        
-        <div class="w-full h-full flex items-center justify-center rounded-3xl transition-all duration-200"
-             :class="{'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)]': item.isDragging}">
-          <span v-if="item.type === 'text'" class="text-5xl md:text-7xl font-black text-white drop-shadow-md">{{ item.content }}</span>
-          <span v-else-if="item.type === 'emoji'" :style="{ fontSize: (item.size * 0.7) + 'px' }" class="drop-shadow-md md:scale-125">{{ item.content }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute bottom-8 md:bottom-12 inset-x-0 flex justify-center pointer-events-none z-10 px-4">
-      <p class="text-xs sm:text-sm md:text-xl bg-slate-900/90 border border-slate-700 px-4 md:px-8 py-2 md:py-3 rounded-full text-slate-300 font-bold shadow-xl text-center w-full max-w-lg">
-        ✊ กำมือหยิบของ | 🖐 แบมือเพื่อปล่อยเรียงในกล่อง <button @click="toggleFullScreen" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-white shadow-xl hover:bg-slate-800 transition-colors cursor-pointer text-xl">
-          ♐
+      <div class="flex gap-2 md:gap-4 pointer-events-auto items-center">
+        <button @click="skipQuestion" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-yellow-400 font-bold shadow-xl hover:bg-slate-800 transition-colors flex items-center gap-2">
+          <span>⏭️</span> ข้าม
         </button>
-      </p>
+        <button @click="toggleFullScreen" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-white shadow-xl hover:bg-slate-800 transition-colors text-xl">
+          🔲
+        </button>
+        <button @click="$emit('back-to-menu')" class="bg-slate-900/80 px-6 py-2 rounded-2xl border border-white/20 text-white font-bold shadow-xl hover:bg-red-900 hover:border-red-500 transition-colors">
+          ออก
+        </button>
+      </div>
     </div>
 
-    <div v-if="gameEnded" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 z-50 pointer-events-auto">
-      <h2 class="text-6xl md:text-8xl text-green-400 font-black mb-4 drop-shadow-lg animate-bounce">เก่งมาก!</h2>
-      <p class="text-2xl md:text-4xl text-white mb-8 text-center">เรียนรู้ลำดับได้ยอดเยี่ยมเลย</p>
-      <div class="bg-slate-900 px-12 py-5 rounded-3xl border border-yellow-500 mb-10 shadow-[0_0_30px_rgba(234,179,8,0.3)]">
-        <h3 class="text-5xl md:text-7xl font-black text-yellow-400">คะแนน: {{ score }}</h3>
+    <div class="absolute top-1/2 -translate-y-1/2 inset-x-0 flex justify-center gap-4 md:gap-8 z-10 pointer-events-none px-4">
+      <div v-for="(zone, index) in 4" :key="'zone-'+index" :id="'drop-zone-'+index"
+           class="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 border-4 border-dashed rounded-2xl md:rounded-3xl flex flex-col items-center justify-center transition-all duration-300"
+           :class="placedItems[index] ? 'border-green-400 bg-green-400/20' : 'border-white/40 bg-black/40'">
+        
+        <div v-if="placedItems[index]" class="w-full h-full flex items-center justify-center p-2 animate-bounce">
+          <img :src="placedItems[index].src" class="max-w-full max-h-full object-contain drop-shadow-lg" />
+        </div>
+        
+        <span v-else class="text-white/20 text-4xl md:text-6xl font-black">{{ index + 1 }}</span>
       </div>
-      <button @click="$emit('back-to-menu')" class="px-8 md:px-10 py-3 md:py-4 bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-2xl md:text-3xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer">กลับหน้าหลัก</button>
+    </div>
+
+    <div id="choices-layer" class="absolute inset-0 pointer-events-none z-20">
+      <div v-for="(item, index) in currentItems" :key="'choice-'+item.id" :id="'choice-'+index"
+           class="absolute rounded-2xl flex items-center justify-center bg-slate-800 border-2 border-cyan-400 shadow-lg transition-transform duration-200"
+           :class="item.isDragging ? 'scale-125 z-50 shadow-[0_0_30px_rgba(34,211,238,0.8)]' : 'scale-100 z-20'"
+           :style="{ left: item.x + 'px', top: item.y + 'px', width: boxSize+'px', height: boxSize+'px', transition: item.isDragging ? 'none' : 'all 0.4s ease', display: item.isPlaced ? 'none' : 'flex' }">
+        <img v-if="item.src" :src="item.src" class="w-full h-full object-contain p-2" draggable="false" />
+      </div>
+    </div>
+
+    <div v-if="showLevelComplete" class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-auto">
+       <h1 class="text-6xl md:text-8xl font-black text-yellow-400 animate-bounce drop-shadow-[0_0_20px_rgba(250,204,21,0.8)]">ยอดเยี่ยม! 🌟</h1>
     </div>
 
     <div v-if="webglError" class="absolute inset-0 z-1000 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center pointer-events-auto backdrop-blur-sm">
       <div class="text-7xl mb-6 animate-bounce">⚠️</div>
       <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-4">หน่วยความจำกล้องเต็ม</h2>
-      <p class="text-slate-300 text-lg md:text-2xl mb-8">ระบบตรวจพบ WebGL Error (อาการจอดำ)<br>กรุณากดปุ่มด้านล่างเพื่อล้างแคชครับ</p>
-      <button @click="clearCache" class="px-10 py-4 bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-2xl text-2xl font-bold shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all cursor-pointer">
+      <p class="text-slate-300 text-lg md:text-2xl mb-8">ระบบตรวจพบอาการจอดำ<br>กรุณากดปุ่มด้านล่างเพื่อล้างแคชครับ</p>
+      <button @click="clearCache" class="px-10 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl text-2xl font-bold shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all cursor-pointer">
         🛠️ ล้างแคชและรีสตาร์ท
       </button>
     </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useAudio } from '../composables/useAudio'
-
-const webglError = ref(false)
-
-const clearCache = () => {
-  window.location.reload();
-}
-
-const toggleFullScreen = () => {
-  const elem = gameContainer.value || document.documentElement;
-  if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));
-  else if (document.exitFullscreen) document.exitFullscreen();
-}
+import { useAudio } from '../composables/useAudio' 
 
 const props = defineProps({ config: Object })
 const emit = defineEmits(['back-to-menu'])
@@ -107,152 +74,190 @@ const videoElement = ref(null)
 const canvasElement = ref(null)
 
 const score = ref(0)
-const gameEnded = ref(false)
-const isTransitioning = ref(false)
-const currentQ = ref(0)
-
-const currentQuestion = ref({})
-const activeItems = ref([])
-const placedItems = ref([null, null, null, null])
+const webglError = ref(false)
+const showLevelComplete = ref(false)
+let isTransitioning = false
 
 let camera = null
 let hands = null
-let grabbedItemId = null
+let grabbedIndex = null
 let isHandGrabbing = false
 
-const getOffset = () => window.innerWidth < 768 ? 40 : 60
+const boxSize = window.innerWidth < 768 ? 70 : 100 // ขนาดกล่องภาพตัวเลือก
 
-const generateQuestions = () => {
-  const qs = []; const types = ['num_asc', 'num_desc', 'size_asc', 'size_desc']
-  for(let i=0; i<10; i++) {
-    const type = types[Math.floor(Math.random() * types.length)]; let instruction = ""; let items = []
-    if (type === 'num_asc') {
-      instruction = "เรียงจาก น้อย ไป มาก"
-      const start = Math.floor(Math.random() * 5) + 1 
-      items = [{ id: 0, content: start, type: 'text', correctIndex: 0 }, { id: 1, content: start+1, type: 'text', correctIndex: 1 }, { id: 2, content: start+2, type: 'text', correctIndex: 2 }, { id: 3, content: start+3, type: 'text', correctIndex: 3 }]
-    } else if (type === 'num_desc') {
-      instruction = "เรียงจาก มาก ไป น้อย"
-      const start = Math.floor(Math.random() * 5) + 5 
-      items = [{ id: 0, content: start, type: 'text', correctIndex: 0 }, { id: 1, content: start-1, type: 'text', correctIndex: 1 }, { id: 2, content: start-2, type: 'text', correctIndex: 2 }, { id: 3, content: start-3, type: 'text', correctIndex: 3 }]
-    } else if (type === 'size_asc') {
-      instruction = "เรียงจาก เล็ก ไป ใหญ่"
-      const emoji = ['🍎', '🐘', '🐶', '⚽'][Math.floor(Math.random() * 4)]
-      items = [{ id: 0, content: emoji, type: 'emoji', size: 40, correctIndex: 0 }, { id: 1, content: emoji, type: 'emoji', size: 60, correctIndex: 1 }, { id: 2, content: emoji, type: 'emoji', size: 80, correctIndex: 2 }, { id: 3, content: emoji, type: 'emoji', size: 100, correctIndex: 3 }]
-    } else if (type === 'size_desc') {
-      instruction = "เรียงจาก ใหญ่ ไป เล็ก"
-      const emoji = ['🍎', '🐘', '🐶', '⚽'][Math.floor(Math.random() * 4)]
-      items = [{ id: 0, content: emoji, type: 'emoji', size: 100, correctIndex: 0 }, { id: 1, content: emoji, type: 'emoji', size: 80, correctIndex: 1 }, { id: 2, content: emoji, type: 'emoji', size: 60, correctIndex: 2 }, { id: 3, content: emoji, type: 'emoji', size: 40, correctIndex: 3 }]
-    }
-    qs.push({ instruction, items })
-  }
-  return qs
+const currentItems = ref([])
+const placedItems = ref([null, null, null, null]) // เก็บรหัสรูปที่ถูกวางลงหลุม 1-4
+
+// ฐานข้อมูลรูปภาพบน GitHub (แก้ไข/เพิ่มไฟล์รูปได้ที่นี่เลยครับ)
+const githubBaseUrl = "https://raw.githubusercontent.com/escmon/lenARgame/main/public/images"
+const imageDatabase = {
+  "animals": ["dog.png", "cat.png", "bird.png", "elephant.png"],
+  "fruits": ["apple.png", "banana.png", "orange.png", "mango.png"]
+}
+const getImageUrl = (folder, filename) => `${githubBaseUrl}/${folder}/${encodeURIComponent(filename)}`
+
+// ปุ่มเต็มจอ
+const toggleFullScreen = () => {
+  const elem = gameContainer.value || document.documentElement;
+  if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));
+  else if (document.exitFullscreen) document.exitFullscreen();
 }
 
-const githubBaseUrl = "https://raw.githubusercontent.com/escmon/lenARgame/main/public/images";
+// ปุ่มล้างแรม GPU
+const clearCache = () => { window.location.reload(); }
 
-// 1. กำหนดหมวดหมู่ และรายชื่อไฟล์รูปภาพที่มีในโฟลเดอร์นั้นบน GitHub
-const imageDatabase = {
-  "animals": ["dog.png", "cat.png", "bird.png", "elephant.png", "lion.png"],
-  "fruits": ["apple.png", "banana.png", "orange.png", "mango.png"],
-  "vehicles": ["car.png", "bus.png", "train.png", "airplane.png"]
-};
+// ข้ามไปข้อถัดไป
+const skipQuestion = () => {
+  if (isTransitioning) return;
+  loadNextQuestion();
+}
 
-// 2. ฟังก์ชันช่วยสร้าง URL รูปภาพฉบับเต็ม
-const getImageUrl = (folder, filename) => `${githubBaseUrl}/${folder}/${encodeURIComponent(filename)}`;
-
-const questionsList = generateQuestions()
-
+// ฟังก์ชันสุ่มโจทย์
 const loadNextQuestion = () => {
-  // สุ่มเลือก 2 หมวดหมู่ที่ไม่ซ้ำกัน (เช่น สัตว์ vs ผลไม้)
-  const categories = Object.keys(imageDatabase).sort(() => Math.random() - 0.5);
-  const leftCategory = categories[0];
-  const rightCategory = categories[1];
-
-  // ตั้งชื่อป้ายกำกับหลุมซ้าย-ขวา
-  leftDropZoneName.value = leftCategory === 'animals' ? 'สัตว์' : leftCategory === 'fruits' ? 'ผลไม้' : 'ยานพาหนะ';
-  rightDropZoneName.value = rightCategory === 'animals' ? 'สัตว์' : rightCategory === 'fruits' ? 'ผลไม้' : 'ยานพาหนะ';
-
-  // สุ่มหยิบรูปภาพจากทั้ง 2 หมวดหมู่ มารวมกันเพื่อสร้างเป็นกล่องโจทย์
-  let items = [];
+  placedItems.value = [null, null, null, null] // ล้างกระดานหลุม
   
-  // สุ่มหยิบหมวดซ้าย 2 รูป
-  let leftItems = [...imageDatabase[leftCategory]].sort(() => Math.random() - 0.5).slice(0, 2);
-  leftItems.forEach(img => items.push({ type: 'image', src: getImageUrl(leftCategory, img), correctZone: 'left' }));
+  // สุ่มเลือก 1 หมวดหมู่ (เช่น animals)
+  const categories = Object.keys(imageDatabase)
+  const selectedCategory = categories[Math.floor(Math.random() * categories.length)]
+  const images = [...imageDatabase[selectedCategory]].slice(0, 4) // ดึงมา 4 รูป
 
-  // สุ่มหยิบหมวดขวา 2 รูป
-  let rightItems = [...imageDatabase[rightCategory]].sort(() => Math.random() - 0.5).slice(0, 2);
-  rightItems.forEach(img => items.push({ type: 'image', src: getImageUrl(rightCategory, img), correctZone: 'right' }));
+  let items = []
+  images.forEach((img, index) => {
+    items.push({ 
+      id: index, 
+      src: getImageUrl(selectedCategory, img), 
+      correctIndex: index, // บังคับว่ารูป 0 ต้องลงหลุม 0, รูป 1 ลงหลุม 1
+      isDragging: false,
+      isPlaced: false,
+      x: 0, y: 0, originalX: 0, originalY: 0
+    })
+  })
 
-  // สลับตำแหน่งกล่องโจทย์ก่อนแสดงผล
-  items.sort(() => Math.random() - 0.5);
-  
-  currentItems.value = items; // นำไปผูกกับ UI ของกล่องภาพ
-};
+  // สลับตำแหน่งกล่องให้เด็กงงก่อน
+  items.sort(() => Math.random() - 0.5)
+  currentItems.value = items
 
+  // หน่วงเวลาจัดตำแหน่งให้รูปไปเกิดด้านล่างจอ
+  setTimeout(() => {
+    const w = window.innerWidth
+    const h = window.innerHeight
+    
+    // พิกัด 4 จุดเกิด
+    const spawnPositions = [
+      { x: w * 0.20, y: h * 0.80 },
+      { x: w * 0.40, y: h * 0.80 },
+      { x: w * 0.60, y: h * 0.80 },
+      { x: w * 0.80, y: h * 0.80 }
+    ].sort(() => Math.random() - 0.5)
+
+    currentItems.value.forEach((item, i) => {
+      const offset = boxSize / 2
+      item.x = spawnPositions[i].x - offset
+      item.y = spawnPositions[i].y - offset
+      item.originalX = item.x
+      item.originalY = item.y
+    })
+  }, 100)
+}
+
+// เช็คว่าชนะด่านนี้หรือยัง (เรียงครบ 4 อันไหม)
 const checkWinCondition = () => {
   if (placedItems.value.every(item => item !== null)) {
-    isTransitioning.value = true; score.value += 50
-    setTimeout(() => { currentQ.value++; loadNextQuestion() }, 2000)
+    isTransitioning = true
+    showLevelComplete.value = true
+    if (window.confetti) window.confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } })
+    
+    // รอ 3 วินาทีแล้วไปโจทย์ข้อใหม่
+    setTimeout(() => {
+      showLevelComplete.value = false
+      isTransitioning = false
+      loadNextQuestion()
+    }, 3000)
   }
 }
 
+// เช็คการชนกันของกรอบ
 const isPointInRect = (px, py, rect) => (px >= rect.left && px <= rect.right && py >= rect.top && py <= rect.bottom)
 
 const onResults = (results) => {
-  if (gameEnded.value || isTransitioning.value) return
-  const ctx = canvasElement.value ? canvasElement.value.getContext('2d') : null
-  if (!ctx || !canvasElement.value) return
+  if (webglError.value) return
+  const canvas = canvasElement.value; if (!canvas) return
+  const ctx = canvas.getContext('2d'); if (!ctx) return
 
-  ctx.save(); ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
-  ctx.translate(canvasElement.value.width, 0); ctx.scale(-1, 1); ctx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
+  ctx.save()
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.translate(canvas.width, 0); ctx.scale(-1, 1)
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height)
 
-  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0 && !isTransitioning) {
     const landmarks = results.multiHandLandmarks[0]
-    window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {color: 'rgba(34, 211, 238, 0.4)', lineWidth: 3})
-    window.drawLandmarks(ctx, landmarks, {color: '#facc15', lineWidth: 1, radius: 3})
+    const indexTip = landmarks[8], thumb = landmarks[4]
+    
+    const curX = canvas.width * (1 - indexTip.x)
+    const curY = canvas.height * indexTip.y
+    const dist = Math.hypot(curX - (canvas.width * (1 - thumb.x)), curY - (canvas.height * thumb.y))
+    
+    const grabThresh = canvas.width < 768 ? 35 : 45
+    const relThresh = canvas.width < 768 ? 65 : 85
 
-    const thumb = landmarks[4], indexTip = landmarks[8]
-    const cursorX = window.innerWidth - (indexTip.x * window.innerWidth), cursorY = indexTip.y * window.innerHeight
-    const distance = Math.hypot((thumb.x - indexTip.x) * window.innerWidth, (thumb.y - indexTip.y) * window.innerHeight)
-    const grabThreshold = window.innerWidth < 768 ? 30 : 40
+    if (grabbedIndex === null) { isHandGrabbing = dist < grabThresh } 
+    else { isHandGrabbing = dist <= relThresh }
 
-    if (distance < grabThreshold) { isHandGrabbing = true } 
-    else if (distance > grabThreshold + 20) {
-      isHandGrabbing = false
-      if (grabbedItemId !== null) {
-        const item = activeItems.value.find(i => i.id === grabbedItemId)
-        if (item) {
-          item.isDragging = false; let droppedInZone = false
-          for (let i = 0; i < 4; i++) {
-            const zoneEl = document.getElementById(`drop-zone-${i}`)
-            if (zoneEl && isPointInRect(cursorX, cursorY, zoneEl.getBoundingClientRect())) {
-              if (item.correctIndex === i) {
-                item.isPlaced = true; placedItems.value[i] = item; score.value += 10; playCorrect(); droppedInZone = true; checkWinCondition()
-              } else { playWrong() }
-              break
-            }
-          }
-          if (!droppedInZone) { item.x = item.originalX; item.y = item.originalY }
-        }
-        grabbedItemId = null
-      }
-    }
-
-    ctx.save(); ctx.scale(-1, 1); ctx.translate(-canvasElement.value.width, 0); ctx.beginPath(); ctx.arc(window.innerWidth - cursorX, cursorY, 14, 0, 2 * Math.PI)
-    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'; ctx.shadowColor = isHandGrabbing ? '#4ade80' : '#facc15'; ctx.shadowBlur = 15; ctx.fill(); ctx.restore()
+    // วาดเป้าเล็งสีเขียว/เหลือง
+    ctx.beginPath(); ctx.arc(indexTip.x * canvas.width, indexTip.y * canvas.height, 12, 0, 2*Math.PI)
+    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'; ctx.fill()
 
     if (isHandGrabbing) {
-      if (grabbedItemId === null) {
-        for (const item of activeItems.value) {
-          if (!item.isPlaced) {
-            const el = document.getElementById(`drag-item-${item.id}`)
-            if (el && isPointInRect(cursorX, cursorY, el.getBoundingClientRect())) { grabbedItemId = item.id; item.isDragging = true; playGrab(); break }
+      if (grabbedIndex === null) {
+        // เริ่มหยิบจับคำตอบ
+        for (let i = 0; i < 4; i++) {
+          const item = currentItems.value[i]
+          if (!item.isPlaced) { // หยิบได้เฉพาะกล่องที่ยังไม่ลงหลุม
+            const el = document.getElementById(`choice-${i}`)
+            if (el && isPointInRect(curX, curY, el.getBoundingClientRect())) {
+              grabbedIndex = i; item.isDragging = true; playGrab(); break
+            }
           }
         }
       } else {
-        const item = activeItems.value.find(i => i.id === grabbedItemId)
-        if (item) { item.x = cursorX - getOffset(); item.y = cursorY - getOffset() }
+        // กำลังลากกล่อง
+        const item = currentItems.value[grabbedIndex]
+        if (item) {
+          item.x = curX - (boxSize / 2)
+          item.y = curY - (boxSize / 2)
+          
+          // เช็คการเอาไปวางที่หลุม drop-zone-0 ถึง 3
+          for (let i = 0; i < 4; i++) {
+            const zoneEl = document.getElementById(`drop-zone-${i}`)
+            if (zoneEl && isPointInRect(curX, curY, zoneEl.getBoundingClientRect())) {
+              
+              if (item.correctIndex === i) {
+                // ตอบถูก ลงถูกหลุม
+                item.isPlaced = true
+                placedItems.value[i] = item
+                score.value += 10
+                playCorrect()
+                grabbedIndex = null
+                item.isDragging = false
+                checkWinCondition() // เช็คว่าจบเกมหรือยัง
+              } else {
+                // ตอบผิดหลุม ให้เด้งกลับไปที่เดิม
+                playWrong()
+                item.x = item.originalX
+                item.y = item.originalY
+                grabbedIndex = null
+                item.isDragging = false
+              }
+              break
+            }
+          }
+        }
       }
+    } else if (grabbedIndex !== null) {
+      // แบมือปล่อยกลางอากาศ
+      const item = currentItems.value[grabbedIndex]
+      if (item) { item.isDragging = false; item.x = item.originalX; item.y = item.originalY }
+      grabbedIndex = null
     }
   }
   ctx.restore()
@@ -262,45 +267,32 @@ onMounted(() => {
   canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight
   window.addEventListener('resize', () => { if(canvasElement.value) { canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight } })
   
-  // 🔥 ดักจับ WebGL เผื่อฉุกเฉินให้กู้คืนตัวเอง
-  // เปลี่ยนจากของเดิม ให้กลายเป็นเปิดหน้าจอ webglError.value = true
-  canvasElement.value.addEventListener("webglcontextlost", (e) => { 
-    e.preventDefault(); 
-    console.warn("WebGL Context Lost!");
-    webglError.value = true; // <--- โชว์ป้ายเตือนทันทีที่จอดำ
+  // ดัก Error WebGL
+  canvasElement.value.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault(); console.warn("WebGL Lost!"); webglError.value = true;
   }, false)
   canvasElement.value.addEventListener("webglcontextrestored", () => {
-    if(camera) camera.start();
-  }, false);
+    if(camera) camera.start()
+  }, false)
 
   loadNextQuestion()
-  
+
+  // เริ่มกล้องและ AI มือ
   hands = new window.Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`})
   hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 })
   hands.onResults(onResults)
-  camera = new window.Camera(videoElement.value, { onFrame: async () => { if(videoElement.value) await hands.send({image: videoElement.value}) }, width: 640, height: 480, facingMode: 'user' })
+  
+  camera = new window.Camera(videoElement.value, { onFrame: async () => { if(videoElement.value && !webglError.value) await hands.send({image: videoElement.value}) }, width: 640, height: 480, facingMode: 'user' })
   camera.start()
 })
 
-// 🔥 อัปเกรด onUnmounted ให้ล้าง AI ทิ้ง 100% 
+// ปิดกล้องเคลียร์แรม
 onUnmounted(async () => {
-  if (camera) { await camera.stop(); camera = null; }
-  // จุดสำคัญที่สุด: ต้อง await hands.close() เพื่อคืนแรม GPU ให้ระบบ
-  if (hands) { await hands.close(); hands = null; } 
+  if (camera) { await camera.stop(); camera = null }
+  if (hands) { await hands.close(); hands = null }
   if (canvasElement.value) {
-    const ctx = canvasElement.value.getContext('2d');
-    if (ctx) ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
+    const ctx = canvasElement.value.getContext('2d')
+    if (ctx) ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
   }
 })
 </script>
-
-<style scoped>
-.drag-item { width: 80px; height: 80px; }
-@media (min-width: 768px) { .drag-item { width: 120px; height: 120px; } }
-
-@keyframes bounce-in { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-.animate-bounce-in { animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
-.portrait-lock { display: none; }
-@media screen and (orientation: portrait) and (max-width: 768px) { .portrait-lock { display: flex !important; } }
-</style>
