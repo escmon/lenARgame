@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-radial from-slate-900 via-indigo-950 to-slate-950 select-none">
+  <div class="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-linear-to-br from-slate-900 via-indigo-950 to-slate-950 select-none">
     
     <div class="text-center mb-12">
       <h1 class="text-6xl font-black tracking-wider text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-indigo-400 drop-shadow-md">
         LENLENREAN AR
       </h1>
       <p class="text-slate-400 text-lg mt-2 font-medium">
-        ยินดีต้อนรับคุณครูและนักเรียนเข้าสู่ระบบเกม AR อัจฉริยะครับ
+        ยินดีต้อนรับเข้าสู่ระบบเกม AR อัจฉริยะครับ
       </p>
     </div>
 
@@ -43,17 +43,22 @@
             👨‍🎓 มัธยมศึกษา
           </button>
           
-          <button v-if="activeSubjectId === 'english'" @click="selectVocabMode" class="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-indigo-400">
-            🖼️ โหมดจับคู่ภาพคำศัพท์ (รวม)
-          </button>
+          <div v-if="activeSubjectId === 'math'" class="mt-4 pt-4 border-t border-slate-700">
+            <p class="text-yellow-400 text-sm font-bold mb-3">⭐ โหมดพิเศษ (คณิตศาสตร์)</p>
+            <button @click="startRacing" class="w-full py-3 mb-3 bg-red-600 hover:bg-red-500 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-red-400">
+              🏎️ แข่งรถ 2 ผู้เล่น (บวกเลข)
+            </button>
+            <button @click="startSorting" class="w-full py-3 bg-orange-600 hover:bg-orange-500 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-orange-400">
+              🧩 เกมเรียงลำดับ (อนุบาล)
+            </button>
+          </div>
 
-          <button @click="$emit('start-racing')" class="w-full py-3 mt-2 bg-orange-500 hover:bg-orange-400 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-orange-300">
-            🚗 Racing | Fast เร็วทะลุจอ
-          </button>
+          <div v-if="activeSubjectId === 'english'" class="mt-4 pt-4 border-t border-slate-700">
+            <button @click="selectVocabMode" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-indigo-400">
+              🖼️ โหมดจับคู่ภาพคำศัพท์ (รวม)
+            </button>
+          </div>
 
-          <button @click="$emit('start-sorting')" class="w-full py-3 mt-2 bg-orange-500 hover:bg-orange-400 active:scale-98 text-white text-xl font-bold rounded-xl transition-all shadow-md cursor-pointer border border-orange-300">
-            🧩 โหมดเรียงลำดับ (น้อย-มาก / เล็ก-ใหญ่)
-          </button>
           <button @click="closeModal" class="pt-2 text-slate-400 hover:text-white text-sm font-medium transition-colors cursor-pointer">ยกเลิก</button>
         </div>
 
@@ -83,7 +88,8 @@
 <script setup>
 import { ref } from 'vue'
 
-const emit = defineEmits(['start-game'])
+// หัวใจสำคัญที่ทำให้กดปุ่มแล้วเปิดติด คือการประกาศชื่อคำสั่งให้ครบตรงนี้ครับ!
+const emit = defineEmits(['start-game', 'start-racing', 'start-sorting'])
 
 const showModal = ref(false)
 const modalStep = ref(1)
@@ -129,5 +135,16 @@ const startGame = (level) => {
     level: level,
     lesson: selectedLesson.value
   })
+}
+
+// ฟังก์ชันสั่งเปิดเกมพิเศษ
+const startRacing = () => {
+  showModal.value = false
+  emit('start-racing')
+}
+
+const startSorting = () => {
+  showModal.value = false
+  emit('start-sorting')
 }
 </script>
