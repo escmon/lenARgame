@@ -18,9 +18,19 @@
       
       <div class="bg-slate-900/80 backdrop-blur-md px-6 md:px-12 py-3 md:py-4 rounded-2xl border border-cyan-500/40 text-center min-w-65 md:min-w-85 shadow-2xl transition-all duration-300 pointer-events-auto" :class="{ 'opacity-50 scale-95': isTransitioning }">
         <p class="text-[10px] md:text-xs text-cyan-400 font-bold uppercase tracking-widest mb-1 md:mb-2">{{ config.subject }} - {{ config.grade }} - {{ config.level }}</p>
-        <h1 v-if="currentQuestion && currentQuestion.qType === 'text'" class="text-3xl md:text-5xl font-black text-white tracking-wide">{{ currentQuestion.qText }}</h1>
-        <img v-else-if="currentQuestion && currentQuestion.qType === 'image'" :src="currentQuestion.qText" @click="triggerZoom" class="h-20 md:h-28 object-contain rounded-xl shadow-md bg-white/10 p-2 border border-white/20 cursor-pointer hover:scale-105 transition-transform" />
-        <h1 v-else class="text-2xl md:text-4xl font-black text-white">กำลังโหลดโจทย์...</h1>
+        
+        <h1 v-if="currentQuestion && currentQuestion.qText" class="text-2xl md:text-4xl font-black text-white tracking-wide mb-2">
+          {{ currentQuestion.qText }}
+        </h1>
+        
+        <img v-if="currentQuestion && currentQuestion.imgSrc" 
+             :src="currentQuestion.imgSrc" 
+             @click="triggerZoom(currentQuestion.imgSrc)"
+             class="h-20 md:h-24 object-contain rounded-xl shadow-md bg-white/10 p-2 border border-white/20 cursor-pointer hover:scale-105 transition-transform mx-auto pointer-events-auto" 
+             title="คลิกเพื่อขยายรูปภาพ" />
+             
+        <h1 v-if="!currentQuestion" class="text-2xl md:text-4xl font-black text-white">กำลังโหลดโจทย์...</h1>
+        <p v-if="isTransitioning" class="text-yellow-400 font-bold mt-2 animate-pulse">กำลังเปลี่ยนข้อถัดไปใน 3 วินาที...</p>
       </div>
 
       <div class="flex space-x-2 md:space-x-4">
@@ -32,17 +42,23 @@
       </div>
     </div>
 
-    <div v-if="showZoom" @click="triggerZoom" class="fixed inset-0 bg-black/95 z-100 flex flex-col items-center justify-center cursor-pointer backdrop-blur-md animate-fade-in pointer-events-auto">
-      <img :src="currentQuestion.qText" class="max-w-full max-h-[80vh] object-contain p-4 drop-shadow-2xl" />
+    <div v-if="showZoom" @click="triggerZoom()" class="fixed inset-0 bg-black/95 z-100 flex flex-col items-center justify-center cursor-pointer backdrop-blur-md animate-fade-in pointer-events-auto">
+      <img :src="zoomedImage" class="max-w-full max-h-[80vh] object-contain p-4 drop-shadow-2xl" />
       <p class="absolute bottom-10 text-white text-lg md:text-2xl font-bold animate-pulse bg-slate-900/80 px-8 py-3 rounded-full border border-white/20">⏱️ หยุดเวลาชั่วคราว (แตะเพื่อปิด)</p>
     </div>
+  
 
     <div id="choices-layer" class="absolute inset-0 pointer-events-none z-20">
       <div v-for="(choice, index) in currentChoices" :key="index" :id="'choice-' + index"
            class="choice-box absolute rounded-2xl md:rounded-3xl transition-all duration-200 flex items-center justify-center overflow-visible"
            :class="choiceClasses[index]">
         <span v-if="choice.type === 'text'" class="text-2xl md:text-4xl font-black text-center px-2 drop-shadow-md">{{ choice.content }}</span>
-        <img v-else-if="choice.type === 'image'" :src="choice.content" class="w-full h-full object-contain scale-125 drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]" draggable="false" />
+        <img v-else-if="choice.type === 'image'" 
+             :src="choice.content" 
+             @click="triggerZoom(choice.content)"
+             class="w-full h-full object-contain scale-125 drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)] cursor-pointer pointer-events-auto hover:scale-150 transition-transform duration-200" 
+             draggable="false" 
+             title="คลิกเพื่อขยาย" />
       </div>
     </div>
 
@@ -99,6 +115,7 @@ const endMessage = ref("หมดเวลา!")
 const isTransitioning = ref(false)
 const isPaused = ref(false)
 const showZoom = ref(false)
+const zoomedImage = ref('')
 let zoomTimeout = null
 
 const questionsDb = ref([])
@@ -131,9 +148,24 @@ const toggleFullScreen = () => {
   else if (document.exitFullscreen) document.exitFullscreen()
 }
 
-const triggerZoom = () => {
-  if (showZoom.value) { showZoom.value = false; isPaused.value = false; clearTimeout(zoomTimeout) }
-  else { showZoom.value = true; isPaused.value = true; zoomTimeout = setTimeout(() => { showZoom.value = false; isPaused.value = false }, 5000) }
+// ปรับให้รับค่า URL ของรูปภาพ
+const triggerZoom = (imgUrl = '') => {
+  if (showZoom.value) { 
+    showZoom.value = false
+    isPaused.value = false
+    clearTimeout(zoomTimeout)
+    zoomedImage.value = ''
+  } else if (imgUrl) { 
+    zoomedImage.value = imgUrl
+    showZoom.value = true
+    isPaused.value = true
+    // ซูมค้างไว้ 5 วินาทีแล้วปิดอัตโนมัติ (หรือแตะจอเพื่อปิดก่อนได้)
+    zoomTimeout = setTimeout(() => { 
+      showZoom.value = false
+      isPaused.value = false
+      zoomedImage.value = ''
+    }, 5000) 
+  }
 }
 
 const showToast = (text, type) => {
@@ -165,6 +197,7 @@ const nextQuestion = () => {
     return
   }
   grabbedIndex = null
+  
   if (props.config.level === 'vocab') {
     const selectedObj = questionsDb.value.splice(Math.floor(Math.random() * questionsDb.value.length), 1)[0]
     const correctWord = selectedObj.word
@@ -173,23 +206,29 @@ const nextQuestion = () => {
       while(wrong1 === correctWord) wrong1 = questionsDb.value[Math.floor(Math.random() * questionsDb.value.length)].word
       while(wrong2 === correctWord || wrong2 === wrong1) wrong2 = questionsDb.value[Math.floor(Math.random() * questionsDb.value.length)].word
     } else { wrong1 = "apple"; wrong2 = "banana" }
+    
     const isTextQuestion = Math.random() > 0.5
     let choices = [correctWord, wrong1, wrong2].sort(() => Math.random() - 0.5)
+    
+    // แยกเก็บ qText เป็นข้อความ และ imgSrc เป็นรูปภาพ
     currentQuestion.value = {
-      qType: isTextQuestion ? 'text' : 'image',
-      qText: isTextQuestion ? correctWord : getFullImageUrl(`/images/vocab/${encodeURIComponent(correctWord)}.png`),
+      qText: isTextQuestion ? correctWord : 'จงเลือกคำศัพท์ให้ตรงกับรูปภาพ',
+      imgSrc: isTextQuestion ? null : getFullImageUrl(`/images/vocab/${encodeURIComponent(correctWord)}.png`),
       a: correctWord,
       c: choices.map(w => ({ type: isTextQuestion ? 'image' : 'text', content: isTextQuestion ? getFullImageUrl(`/images/vocab/${encodeURIComponent(w)}.png`) : w, value: w }))
     }
   } else {
     const rawData = questionsDb.value.splice(Math.floor(Math.random() * questionsDb.value.length), 1)[0] 
+    
+    // ดึงค่าข้อความจาก rawData.q ค้างไว้ตลอด และแยกรูปภาพไปไว้ใน imgSrc
     currentQuestion.value = {
-      qType: rawData.img ? 'image' : 'text',
-      qText: rawData.img ? getFullImageUrl(rawData.img) : rawData.q,
+      qText: rawData.q || '',
+      imgSrc: rawData.img ? getFullImageUrl(rawData.img) : null,
       a: rawData.a,
       c: rawData.c.map(text => ({ type: (text.includes('.png') || text.includes('.jpg')) ? 'image' : 'text', content: (text.includes('.png') || text.includes('.jpg')) ? getFullImageUrl(text) : text, value: text }))
     }
   }
+  
   choicePositions.sort(() => Math.random() - 0.5)
   currentChoices.value = [...currentQuestion.value.c]
   for (let i = 0; i < 3; i++) { const el = document.getElementById(`choice-${i}`); if (el) el.style.display = 'flex' }
@@ -234,13 +273,14 @@ const onResults = (results) => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  // 1. วาดภาพกล้องและสั่งคืนค่าทันทีในทุกเฟรม ป้องกันอาการจอกระพริบตาลาย
+  // 1. บันทึกสถานะและทำกระจกเงาให้กับทั้งเฟรมนี้
   ctx.save()
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.translate(canvas.width, 0)
   ctx.scale(-1, 1)
+  
+  // วาดภาพจากกล้อง
   ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height)
-  ctx.restore() // <-- จุดสำคัญ: ปิดลูปตรงนี้ทันทีเพื่อให้สถานะหน้าจอเสถียร 100%
 
   const hasHands = results.multiHandLandmarks && results.multiHandLandmarks.length > 0
   if (hasHands && !isPlaying.value && timeLeft.value === 100) startGameTimer()
@@ -250,82 +290,139 @@ const onResults = (results) => {
     const indexTip = landmarks[8]
     const thumb = landmarks[4]
     
-    // คำนวณพิกัดให้ตรงกับตำแหน่งหน้าจอ HTML พอดีเป๊ะ
-    const cursorX = window.innerWidth - (indexTip.x * window.innerWidth)
-    const cursorY = indexTip.y * window.innerHeight
-    const distance = Math.hypot((thumb.x - indexTip.x) * window.innerWidth, (thumb.y - indexTip.y) * window.innerHeight)
+    // คำนวณระยะห่างระหว่างปลายนิ้วชี้กับนิ้วโป้งในหน่วยพิกเซลหน้าจอจริง
+    const screenX_index = canvas.width * (1 - indexTip.x)
+    const screenY_index = canvas.height * indexTip.y
+    const screenX_thumb = canvas.width * (1 - thumb.x)
+    const screenY_thumb = canvas.height * thumb.y
     
-    const grabThreshold = window.innerWidth < 768 ? 30 : 40
-    isHandGrabbing = distance < grabThreshold
-
-    // วาดเป้าเล็งสีเหลือง/เขียวตามมือนิ่งๆ ไม่กระตุก
-    ctx.save()
-    ctx.beginPath()
-    ctx.arc(cursorX, cursorY, 15, 0, 2 * Math.PI)
-    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'
-    ctx.shadowBlur = 10; 
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
-    ctx.fill()
-    ctx.restore()
-
-    // ลorจิกการหยิบและลากคำตอบ
-    if (isHandGrabbing && !isTransitioning.value && !isPaused.value) {
-      if (grabbedIndex === null) {
-        for (let i = 0; i < 3; i++) {
-          if (checkCollision(cursorX, cursorY, `choice-${i}`)) {
-            grabbedIndex = i
-            playGrab()
-            choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-110 z-50'
-            break
-          }
-        }
+    const distance = Math.hypot(screenX_index - screenX_thumb, screenY_index - screenY_thumb)
+    
+    // 🔥 แก้ไขระบบตรวจจับด้วยหลัก Hysteresis เพื่อสลัดกล่องให้หลุดทันทีที่กางมือ
+    const grabThreshold = canvas.width < 768 ? 35 : 45      // ต้องจีบนิ้วชิดกันเพื่อหยิบ
+    const releaseThreshold = canvas.width < 768 ? 65 : 85   // ต้องกางนิ้วออกกว้างพอสมควรเพื่อปล่อย
+    
+    if (grabbedIndex === null) {
+      isHandGrabbing = distance < grabThreshold
+    } else {
+      if (distance > releaseThreshold) {
+        isHandGrabbing = false
       } else {
-        const el = document.getElementById(`choice-${grabbedIndex}`)
-        const offset = window.innerWidth < 768 ? 40 : 80
-        if (el) { 
-          el.style.left = `${cursorX - offset}px`
-          el.style.top = `${cursorY - offset}px` 
-        }
-        
-        const zones = ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br']
-        let matchedZone = null
+        isHandGrabbing = true
+      }
+    }
 
-        for (const zId of zones) {
-          if (checkCollision(cursorX, cursorY, zId)) {
-            matchedZone = zId
-            break
-          }
-        }
+    // 2. วาดเป้าเล็งสีเหลือง/เขียว ครอบปลายนิ้วชี้ตามพิกัดหน้าจอจริง
+    ctx.beginPath()
+    ctx.arc(indexTip.x * canvas.width, indexTip.y * canvas.height, 15, 0, 2 * Math.PI)
+    ctx.fillStyle = isHandGrabbing ? '#4ade80' : '#facc15'
+    ctx.fill()
 
-        if (matchedZone && !isTransitioning.value) {
-          const activeEl = document.getElementById(matchedZone)
-          if (activeEl) {
-            isTransitioning.value = true
-            activeEl.classList.add('corner-active')
-            
-            if (currentChoices.value[grabbedIndex].value === currentQuestion.value.a) { 
-              score.value += 10
-              showToast("ถูกต้อง! 🌟", 'correct')
-              playCorrect() 
-            } else { 
-              showToast("ไม่ถูกต้อง ❌", 'wrong')
-              playWrong() 
+    const cursorX = screenX_index
+    const cursorY = screenY_index
+
+    // 3. ลอจิกการหยิบและลากคำตอบ
+    if (isHandGrabbing) {
+      if (!isTransitioning.value && !isPaused.value) {
+        if (grabbedIndex === null) {
+          // เริ่มหยิบจับคำตอบ
+          for (let i = 0; i < 3; i++) {
+            if (checkCollision(cursorX, cursorY, `choice-${i}`)) {
+              grabbedIndex = i
+              playGrab()
+              choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-110 z-50'
+              break
             }
-            if (el) el.style.display = 'none'
+          }
+        } else {
+          // กำลังลากกล่องคำตอบตามมือ
+          const el = document.getElementById(`choice-${grabbedIndex}`)
+          const offset = canvas.width < 768 ? 40 : 80
+          if (el) { 
+            el.style.left = `${cursorX - offset}px`
+            el.style.top = `${cursorY - offset}px` 
+          }
+          
+          // เช็คการลากคำตอบไปวางที่มุมจอ (Drop Zones)
+          const zones = ['zone-tl', 'zone-tr', 'zone-bl', 'zone-br']
+          let matchedZone = null
 
-            setTimeout(() => { 
-              isTransitioning.value = false
-              zones.forEach(id => {
-                const z = document.getElementById(id)
-                if (z) z.classList.remove('corner-active')
-              })
-              nextQuestion() 
-            }, 2000)
+          for (const zId of zones) {
+            if (checkCollision(cursorX, cursorY, zId)) {
+              matchedZone = zId
+              break
+            }
+          }
+
+          if (matchedZone && !isTransitioning.value) {
+            const activeEl = document.getElementById(matchedZone)
+            if (activeEl) {
+              isTransitioning.value = true
+              activeEl.classList.add('corner-active')
+              
+              const answerGiven = currentChoices.value[grabbedIndex].value
+              const isCorrect = answerGiven === currentQuestion.value.a
+
+              if (isCorrect) {
+                score.value += 10
+                showToast("ถูกต้อง! 🌟", 'correct')
+                playCorrect()
+                if (el) el.style.display = 'none'
+
+                setTimeout(() => {
+                  isTransitioning.value = false
+                  zones.forEach(id => {
+                    const z = document.getElementById(id)
+                    if (z) z.classList.remove('corner-active')
+                  })
+                  nextQuestion()
+                }, 2000)
+              } else {
+                showToast("ไม่ถูกต้อง ❌", 'wrong')
+                playWrong()
+                
+                if (el) {
+                  el.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                  el.style.left = `${choicePositions[grabbedIndex].x * window.innerWidth}px`
+                  el.style.top = `${choicePositions[grabbedIndex].y * window.innerHeight}px`
+                }
+
+                const currentIndex = grabbedIndex
+                setTimeout(() => {
+                  choiceClasses.value[currentIndex] = currentChoices.value[currentIndex].type === 'image' 
+                    ? 'bg-transparent border-transparent' 
+                    : 'bg-slate-900/80 text-cyan-300 border-2 border-cyan-500/50 shadow-lg'
+                }, 500)
+
+                setTimeout(() => {
+                  isTransitioning.value = false
+                  activeEl.classList.remove('corner-active')
+                }, 800)
+
+                grabbedIndex = null
+              }
+            }
           }
         }
       }
+    } else {
+      // --- แบมือปล่อยของกลางอากาศเมื่อเปลี่ยนใจ (หลุดออกจากมือทันทีอย่างสะอาด คืนค่าตำแหน่งเดิม) ---
+      if (grabbedIndex !== null && !isTransitioning.value && !isPaused.value) {
+        const el = document.getElementById(`choice-${grabbedIndex}`)
+        if (el) {
+          el.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          el.style.left = `${choicePositions[grabbedIndex].x * window.innerWidth}px`
+          el.style.top = `${choicePositions[grabbedIndex].y * window.innerHeight}px`
+        }
+        choiceClasses.value[grabbedIndex] = currentChoices.value[grabbedIndex].type === 'image' 
+          ? 'bg-transparent border-transparent' 
+          : 'bg-slate-900/80 text-cyan-300 border-2 border-cyan-500/50 shadow-lg'
+        grabbedIndex = null
+      }
     }
   }
+
+  ctx.restore()
 }
 
 onMounted(() => {
