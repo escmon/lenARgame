@@ -30,20 +30,51 @@
       </div>
 
       <!-- Track -->
-      <div class="flex-1 relative overflow-hidden bg-slate-800/50 mx-10 border-x-4 border-dashed border-white/50 flex">
-        <!-- P1 Lane -->
-        <div class="w-1/2 h-full relative border-r-4 border-dashed border-white/30 flex justify-center">
-          <div class="absolute w-16 h-24 bg-red-500 rounded-xl transition-all duration-500 ease-out shadow-2xl border-2 border-white flex items-center justify-center text-white font-bold"
-               :style="{ bottom: p1Progress + '%' }">P1</div>
+      <div class="flex-1 relative overflow-hidden bg-slate-800/80 mx-10 border-x-4 border-dashed border-white/50 flex shadow-inner">
+        <div class="absolute inset-y-0 left-1/2 w-2 -ml-1 bg-size-[10px_40px] opacity-40 z-0" 
+             style="background-image: linear-gradient(to bottom, #fff 50%, transparent 50%);"></div>
+
+        <div class="w-1/2 h-full relative flex justify-center z-10">
+          <div class="absolute w-16 h-28 transition-all duration-500 ease-out flex items-center justify-center animate-engine-idle"
+               :style="{ bottom: p1Progress + '%' }">
+            <div class="absolute -left-1 top-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -left-1 bottom-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -right-1 top-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -right-1 bottom-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            
+            <div class="w-full h-full bg-linear-to-b from-red-500 to-red-700 rounded-3xl shadow-2xl border border-red-800 relative flex flex-col items-center">
+              <div class="w-10 h-6 bg-sky-900/80 rounded-t-xl mt-4 border-b-2 border-slate-800"></div>
+              <div class="w-12 h-8 bg-red-600 mt-1 rounded-md text-white font-bold flex items-center justify-center shadow-inner">P1</div>
+              <div class="w-10 h-3 bg-sky-900/80 rounded-b-md mt-1 border-t border-slate-800"></div>
+              <div class="absolute bottom-2 w-14 h-3 bg-slate-900 rounded-sm shadow-md flex justify-between px-1">
+                <div class="w-3 h-1.5 bg-yellow-400 mt-0.5 rounded-full shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse"></div>
+                <div class="w-3 h-1.5 bg-yellow-400 mt-0.5 rounded-full shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- P2 Lane -->
-        <div class="w-1/2 h-full relative flex justify-center">
-          <div class="absolute w-16 h-24 bg-blue-500 rounded-xl transition-all duration-500 ease-out shadow-2xl border-2 border-white flex items-center justify-center text-white font-bold"
-               :style="{ bottom: p2Progress + '%' }">P2</div>
+
+        <div class="w-1/2 h-full relative flex justify-center z-10">
+          <div class="absolute w-16 h-28 transition-all duration-500 ease-out flex items-center justify-center animate-engine-idle"
+               :style="{ bottom: p2Progress + '%' }">
+            <div class="absolute -left-1 top-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -left-1 bottom-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -right-1 top-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            <div class="absolute -right-1 bottom-4 w-3 h-6 bg-slate-950 rounded-sm shadow-md"></div>
+            
+            <div class="w-full h-full bg-linear-to-b from-blue-500 to-blue-700 rounded-3xl shadow-2xl border border-blue-800 relative flex flex-col items-center">
+              <div class="w-10 h-6 bg-sky-900/80 rounded-t-xl mt-4 border-b-2 border-slate-800"></div>
+              <div class="w-12 h-8 bg-blue-600 mt-1 rounded-md text-white font-bold flex items-center justify-center shadow-inner">P2</div>
+              <div class="w-10 h-3 bg-sky-900/80 rounded-b-md mt-1 border-t border-slate-800"></div>
+              <div class="absolute bottom-2 w-14 h-3 bg-slate-900 rounded-sm shadow-md flex justify-between px-1">
+                <div class="w-3 h-1.5 bg-yellow-400 mt-0.5 rounded-full shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse"></div>
+                <div class="w-3 h-1.5 bg-yellow-400 mt-0.5 rounded-full shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse"></div>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <!-- Finish Line -->
-        <div class="absolute top-0 w-full h-8 bg-repeat-x opacity-80" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #fff 25%, #fff 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+        <div class="absolute top-0 w-full h-8 bg-repeat-x opacity-90 z-20" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #fff 25%, #fff 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
       </div>
     </div>
 
@@ -251,3 +282,16 @@ onUnmounted(() => {
   if (hands) hands.close()
 })
 </script>
+
+<style scoped>
+/* เอฟเฟกต์เครื่องยนต์เดินเบา (สั่นดุ๊กดิ๊ก) */
+@keyframes engine-idle {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+}
+.animate-engine-idle {
+  animation: engine-idle 0.1s infinite;
+}
+</style>
