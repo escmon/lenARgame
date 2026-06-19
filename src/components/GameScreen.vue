@@ -34,7 +34,10 @@
       </div>
 
       <div class="flex space-x-2 md:space-x-4">
-        <button @click="toggleFullScreen" class="bg-slate-900/70 backdrop-blur-md px-3 md:px-4 py-2 rounded-xl border border-white/10 text-white shadow-lg pointer-events-auto hover:bg-slate-800 transition-colors"><span class="text-lg md:text-xl">🔲</span></button>
+        <button @click="toggleFullScreen" class="bg-slate-900/70 backdrop-blur-md px-3 md:px-4 py-2 rounded-xl border border-white/10 text-white shadow-lg pointer-events-auto hover:bg-slate-800 transition-colors"><span class="text-lg md:text-xl">♐</span></button>
+        <button @click="skipQuestion" class="bg-slate-900/70 backdrop-blur-md px-3 md:px-4 py-2 rounded-xl border border-white/10 text-yellow-400 font-bold shadow-lg pointer-events-auto hover:bg-slate-800 transition-colors flex items-center justify-center">
+          <span class="text-sm md:text-lg">⏭️ ข้าม</span>
+        </button>
         <div class="bg-slate-900/70 backdrop-blur-md px-3 md:px-5 py-2 rounded-xl border border-white/10 text-center shadow-lg">
           <p class="text-[10px] md:text-xs text-red-400 font-bold">TIME</p>
           <h2 :class="['text-xl md:text-3xl font-black', timeLeft <= 20 ? 'text-red-500 animate-pulse' : 'text-red-400']">{{ timeLeft }}s</h2>
@@ -110,6 +113,17 @@ const webglError = ref(false)
 
 const clearCache = () => {
   window.location.reload();
+}
+
+const skipQuestion = () => {
+  if (gameEnded.value || isTransitioning.value) return;
+  // ล้างสถานะกล่องที่จับอยู่ แล้วสุ่มข้อใหม่ทันที
+  grabbedIndex = null;
+  isTransitioning.value = true;
+  setTimeout(() => {
+    isTransitioning.value = false;
+    nextQuestion();
+  }, 300); // หน่วงเวลานิดหน่อยให้จอสมูท
 }
 
 const props = defineProps({ config: Object })

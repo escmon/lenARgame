@@ -56,7 +56,9 @@
 
     <div class="absolute bottom-8 md:bottom-12 inset-x-0 flex justify-center pointer-events-none z-10 px-4">
       <p class="text-xs sm:text-sm md:text-xl bg-slate-900/90 border border-slate-700 px-4 md:px-8 py-2 md:py-3 rounded-full text-slate-300 font-bold shadow-xl text-center w-full max-w-lg">
-        ✊ กำมือหยิบของ | 🖐 แบมือเพื่อปล่อยเรียงในกล่อง
+        ✊ กำมือหยิบของ | 🖐 แบมือเพื่อปล่อยเรียงในกล่อง <button @click="toggleFullScreen" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-white shadow-xl hover:bg-slate-800 transition-colors cursor-pointer text-xl">
+          ♐
+        </button>
       </p>
     </div>
 
@@ -88,6 +90,12 @@ const webglError = ref(false)
 
 const clearCache = () => {
   window.location.reload();
+}
+
+const toggleFullScreen = () => {
+  const elem = gameContainer.value || document.documentElement;
+  if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));
+  else if (document.exitFullscreen) document.exitFullscreen();
 }
 
 const props = defineProps({ config: Object })
@@ -140,16 +148,46 @@ const generateQuestions = () => {
   return qs
 }
 
+const githubBaseUrl = "https://raw.githubusercontent.com/escmon/lenARgame/main/public/images";
+
+// 1. กำหนดหมวดหมู่ และรายชื่อไฟล์รูปภาพที่มีในโฟลเดอร์นั้นบน GitHub
+const imageDatabase = {
+  "animals": ["dog.png", "cat.png", "bird.png", "elephant.png", "lion.png"],
+  "fruits": ["apple.png", "banana.png", "orange.png", "mango.png"],
+  "vehicles": ["car.png", "bus.png", "train.png", "airplane.png"]
+};
+
+// 2. ฟังก์ชันช่วยสร้าง URL รูปภาพฉบับเต็ม
+const getImageUrl = (folder, filename) => `${githubBaseUrl}/${folder}/${encodeURIComponent(filename)}`;
+
 const questionsList = generateQuestions()
 
 const loadNextQuestion = () => {
-  if (currentQ.value >= questionsList.length) { gameEnded.value = true; if (window.confetti) window.confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } }); return }
-  isTransitioning.value = false; placedItems.value = [null, null, null, null]
-  currentQuestion.value = questionsList[currentQ.value]
-  const w = window.innerWidth, h = window.innerHeight, yPos = h * 0.75 
-  const xPositions = [w*0.2, w*0.4, w*0.6, w*0.8].sort(() => Math.random() - 0.5)
-  activeItems.value = currentQuestion.value.items.map((item, index) => ({ ...item, x: xPositions[index] - getOffset(), y: yPos - getOffset(), originalX: xPositions[index] - getOffset(), originalY: yPos - getOffset(), isDragging: false, isPlaced: false }))
-}
+  // สุ่มเลือก 2 หมวดหมู่ที่ไม่ซ้ำกัน (เช่น สัตว์ vs ผลไม้)
+  const categories = Object.keys(imageDatabase).sort(() => Math.random() - 0.5);
+  const leftCategory = categories[0];
+  const rightCategory = categories[1];
+
+  // ตั้งชื่อป้ายกำกับหลุมซ้าย-ขวา
+  leftDropZoneName.value = leftCategory === 'animals' ? 'สัตว์' : leftCategory === 'fruits' ? 'ผลไม้' : 'ยานพาหนะ';
+  rightDropZoneName.value = rightCategory === 'animals' ? 'สัตว์' : rightCategory === 'fruits' ? 'ผลไม้' : 'ยานพาหนะ';
+
+  // สุ่มหยิบรูปภาพจากทั้ง 2 หมวดหมู่ มารวมกันเพื่อสร้างเป็นกล่องโจทย์
+  let items = [];
+  
+  // สุ่มหยิบหมวดซ้าย 2 รูป
+  let leftItems = [...imageDatabase[leftCategory]].sort(() => Math.random() - 0.5).slice(0, 2);
+  leftItems.forEach(img => items.push({ type: 'image', src: getImageUrl(leftCategory, img), correctZone: 'left' }));
+
+  // สุ่มหยิบหมวดขวา 2 รูป
+  let rightItems = [...imageDatabase[rightCategory]].sort(() => Math.random() - 0.5).slice(0, 2);
+  rightItems.forEach(img => items.push({ type: 'image', src: getImageUrl(rightCategory, img), correctZone: 'right' }));
+
+  // สลับตำแหน่งกล่องโจทย์ก่อนแสดงผล
+  items.sort(() => Math.random() - 0.5);
+  
+  currentItems.value = items; // นำไปผูกกับ UI ของกล่องภาพ
+};
 
 const checkWinCondition = () => {
   if (placedItems.value.every(item => item !== null)) {

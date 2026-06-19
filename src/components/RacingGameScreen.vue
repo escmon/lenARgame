@@ -20,6 +20,9 @@
       </div>
       
       <div class="flex gap-4 pointer-events-auto">
+        <button @click="toggleFullScreen" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-white shadow-xl hover:bg-slate-800 transition-colors cursor-pointer text-xl">
+          ♐
+        </button>
         <!-- ปุ่มเปิด/ปิดเสียง -->
         <button @click="handleToggleMute" class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/20 text-white font-bold shadow-xl hover:bg-slate-800 transition-colors cursor-pointer text-xl">
           {{ isMutedUI ? '🔇' : '🔊' }}
@@ -128,6 +131,12 @@ const webglError = ref(false)
 
 const clearCache = () => {
   window.location.reload();
+}
+
+const toggleFullScreen = () => {
+  const elem = gameContainer.value || document.documentElement;
+  if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));
+  else if (document.exitFullscreen) document.exitFullscreen();
 }
 
 const props = defineProps({ config: Object })
