@@ -208,14 +208,34 @@ const onResults = (results) => {
 onMounted(() => {
   canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight
   window.addEventListener('resize', () => { if(canvasElement.value) { canvasElement.value.width = window.innerWidth; canvasElement.value.height = window.innerHeight } })
+  
+  // 🔥 ดักจับ WebGL เผื่อฉุกเฉินให้กู้คืนตัวเอง
+  canvasElement.value.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault(); console.warn("WebGL Lost! กำลังกู้คืน...");
+  }, false);
+  canvasElement.value.addEventListener("webglcontextrestored", () => {
+    if(camera) camera.start();
+  }, false);
+
   loadNextQuestion()
+  
   hands = new window.Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`})
   hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 })
   hands.onResults(onResults)
   camera = new window.Camera(videoElement.value, { onFrame: async () => { if(videoElement.value) await hands.send({image: videoElement.value}) }, width: 640, height: 480, facingMode: 'user' })
   camera.start()
 })
-onUnmounted(() => { if (camera) camera.stop(); if (hands) hands.close() })
+
+// 🔥 อัปเกรด onUnmounted ให้ล้าง AI ทิ้ง 100% 
+onUnmounted(async () => {
+  if (camera) { await camera.stop(); camera = null; }
+  // จุดสำคัญที่สุด: ต้อง await hands.close() เพื่อคืนแรม GPU ให้ระบบ
+  if (hands) { await hands.close(); hands = null; } 
+  if (canvasElement.value) {
+    const ctx = canvasElement.value.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
+  }
+})
 </script>
 
 <style scoped>
