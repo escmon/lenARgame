@@ -51,12 +51,12 @@
         v-for="(choice, index) in currentChoices" 
         :key="index"
         :id="'choice-' + index"
-        class="choice-box absolute rounded-2xl border shadow-lg transition-colors duration-200 flex items-center justify-center overflow-hidden"
+        class="choice-box absolute rounded-3xl transition-all duration-200 flex items-center justify-center overflow-visible"
         :class="choiceClasses[index]"
         style="width: 160px; height: 120px;"
       >
-        <span v-if="choice.type === 'text'" class="text-3xl font-black text-center px-2">{{ choice.content }}</span>
-        <img v-else-if="choice.type === 'image'" :src="choice.content" class="w-full h-full object-contain p-2 bg-white" draggable="false" />
+        <span v-if="choice.type === 'text'" class="text-4xl font-black text-center px-2 drop-shadow-md">{{ choice.content }}</span>
+        <img v-else-if="choice.type === 'image'" :src="choice.content" class="w-full h-full object-contain scale-125 drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]" draggable="false" />
       </div>
     </div>
 
@@ -288,7 +288,9 @@ const nextQuestion = () => {
       if (el) {
         el.style.left = `${choicePositions[i].x * window.innerWidth}px`
         el.style.top = `${choicePositions[i].y * window.innerHeight}px`
-        choiceClasses.value[i] = 'bg-slate-900/80 text-cyan-300 border-cyan-500/50'
+        choiceClasses.value[i] = currentChoices.value[i].type === 'image' 
+          ? 'bg-transparent border-transparent' 
+          : 'bg-slate-900/80 text-cyan-300 border-2 border-cyan-500/50 shadow-lg'
       }
     }
   }, 50)
@@ -369,7 +371,9 @@ const onResults = (results) => {
           el.style.left = `${choicePositions[grabbedIndex].x * window.innerWidth}px`
           el.style.top = `${choicePositions[grabbedIndex].y * window.innerHeight}px`
         }
-        choiceClasses.value[grabbedIndex] = 'bg-slate-900/80 text-cyan-300 border-cyan-500/50'
+        choiceClasses.value[grabbedIndex] = currentChoices.value[grabbedIndex].type === 'image' 
+          ? 'bg-transparent border-transparent' 
+          : 'bg-slate-900/80 text-cyan-300 border-2 border-cyan-500/50 shadow-lg'
         grabbedIndex = null
       }
     }
@@ -393,7 +397,7 @@ const onResults = (results) => {
             const el = document.getElementById(`choice-${grabbedIndex}`)
             if (el) el.style.transition = 'none' 
             playGrab()
-            choiceClasses.value[i] = 'bg-linear-to-r from-purple-600 to-indigo-600 text-white border-yellow-400 animate-pulse'
+            choiceClasses.value[i] = 'bg-white/20 backdrop-blur-md border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.8)] text-white scale-125 z-50'
             break
           }
         }
